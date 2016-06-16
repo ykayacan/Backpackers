@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- CircleImageView -->
+    <declare-styleable name="CircleImageView">
+        <attr name="circleImageEnabled" format="boolean" />
+        <attr name="placeholderCircleColor" format="color" />
+        <attr name="placeholderTextSize" format="dimension" />
+        <attr name="placeholderTextColor" format="color" />
+        <attr name="placeholderIconSize" format="dimension" />
+        <attr name="placeholderIconColor" format="color" />
+    </declare-styleable>
+
+</resources>

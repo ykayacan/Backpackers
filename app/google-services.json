@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_number": "369106561777",
+    "project_id": "yoloo-967be"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369106561777:android:9ba7b4c8da97a4ad",
+        "android_client_info": {
+          "package_name": "com.yoloo.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369106561777-r0jg5h20eeuhho2gha25e5m2rmf66pd8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yoloo.android",
+            "certificate_hash": "D1D594C1AD5E5A5F15A46A1D77CAE821C462CCB7"
+          }
+        },
+        {
+          "client_id": "369106561777-8cqi3ujggnjc723tqgmrm7i1ip5v215q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMCCfYnLhrIymBgLE1apuI0oxFXbeARLg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-79257376-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
