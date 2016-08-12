@@ -9,17 +9,25 @@ import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.users.User;
 
-import com.yoloo.android.backend.Constants;
-import com.yoloo.android.backend.modal.Account;
-import com.yoloo.android.backend.modal.Comment;
-import com.yoloo.android.backend.modal.Feed;
-import com.yoloo.android.backend.util.CommentHelper;
-import com.yoloo.android.backend.util.EndpointUtil;
-import com.yoloo.android.backend.validator.Validator;
-import com.yoloo.android.backend.validator.rule.IdValidationRule;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
+import com.yoloo.android.backend.Constants;
+import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
+import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
+import com.yoloo.android.backend.authenticator.YolooAuthenticator;
+import com.yoloo.android.backend.controller.CommentController;
+import com.yoloo.android.backend.model.comment.Comment;
+import com.yoloo.android.backend.model.like.Like;
+import com.yoloo.android.backend.model.question.Question;
+import com.yoloo.android.backend.util.ClassUtil;
+import com.yoloo.android.backend.validator.Validator;
+import com.yoloo.android.backend.validator.rule.comment.CommentCreateRule;
+import com.yoloo.android.backend.validator.rule.common.AllowedToOperate;
+import com.yoloo.android.backend.validator.rule.common.AuthenticationRule;
+import com.yoloo.android.backend.validator.rule.common.IdValidationRule;
+import com.yoloo.android.backend.validator.rule.common.NotFoundRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +53,16 @@ import static com.yoloo.android.backend.service.OfyHelper.ofy;
                 Constants.ANDROID_CLIENT_ID,
                 Constants.IOS_CLIENT_ID,
                 Constants.WEB_CLIENT_ID},
-        audiences = {Constants.AUDIENCE_ID}
+        audiences = {Constants.AUDIENCE_ID},
+        authenticators = {
+                GoogleAuthenticator.class,
+                FacebookAuthenticator.class,
+                YolooAuthenticator.class
+        }
 )
 public class CommentEndpoint {
 
-    private static final Logger logger = Logger.getLogger(CommentEndpoint.class.getName());
+    private static final Logger logger = Logger.getLogger(CommentEndpoint.class.getSimpleName());
 
     private static final int DEFAULT_LIST_LIMIT = 20;
 
@@ -57,51 +70,49 @@ public class CommentEndpoint {
      * Inserts a new {@code Comment}.
      */
     @ApiMethod(
-            name = "addComment",
-            path = "feeds/{id}/comments",
+            name = "questions.comments.add",
+            path = "questions/{question_id}/comments",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public Comment add(@Named("id") final long id,
+    public Comment add(@Named("question_id") final String questionId,
                        @Named("text") final String text,
-                       @Named("access_token") final String accessToken) throws ServiceException {
+                       final User user) throws ServiceException {
 
-        // Validate.
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(id));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(questionId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new CommentCreateRule(text))
+                .addRule(new NotFoundRule(Question.class, questionId))
+                .validate();
 
-        Key<Account> accountKey = EndpointUtil.isValidToken(accessToken);
-
-        EndpointUtil.checkItemExists(Feed.class, id);
-
-        return CommentHelper.createComment(accountKey, Key.create(Feed.class, id), text);
+        return CommentController.newInstance().add(questionId, text, user);
     }
 
     /**
      * Deletes the specified {@code Comment}.
      *
-     * @param feedId the ID of the entity to delete
+     * @param questionId the ID of the entity to delete
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Comment}
      */
     @ApiMethod(
-            name = "removeComment",
-            path = "feeds/{feed_id}/comments/{comment_id}",
+            name = "questions.comments.remove",
+            path = "questions/{question_id}/comments/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("feed_id") final long feedId,
-                       @Named("comment_id") final long commentId,
-                       @Named("access_token") String accessToken) throws ServiceException {
+    public void remove(@Named("question_id") final String questionId,
+                       @Named("id") final String commentId,
+                       final User user) throws ServiceException {
 
         // Validate.
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(feedId));
-        validator.addRule(new IdValidationRule(commentId));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(questionId))
+                .addRule(new IdValidationRule(commentId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Question.class, questionId))
+                .addRule(new NotFoundRule(Comment.class, commentId))
+                .addRule(new AllowedToOperate(Comment.class, commentId, user, "delete"))
+                .validate();
 
-        Key<Account> accountKey = EndpointUtil.isValidToken(accessToken);
-        EndpointUtil.checkItemExists(Comment.class, commentId);
-        EndpointUtil.checkIsAuthorizedToRemove(Comment.class, commentId, accountKey);
-
-        CommentHelper.removeComment(commentId);
+        CommentController.newInstance().remove(questionId, commentId, user);
     }
 
     /**
@@ -112,26 +123,48 @@ public class CommentEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "listComment",
-            path = "feeds/{id}/comments",
+            name = "questions.comments.list",
+            path = "questions/{question_id}/comments",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Comment> list(@Named("id") final long id,
+    public CollectionResponse<Comment> list(@Named("question_id") final String questionId,
                                             @Nullable @Named("cursor") String cursor,
-                                            @Nullable @Named("limit") Integer limit) {
+                                            @Nullable @Named("limit") Integer limit,
+                                            final User user) throws ServiceException {
+        Validator.builder()
+                .addRule(new IdValidationRule(questionId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Question.class, questionId))
+                .validate();
+
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
-        Query<Comment> query = ofy().load().type(Comment.class);
+        Query<Comment> query = ofy().load().type(Comment.class).ancestor(Key.create(questionId));
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
 
-        query = query.filter("feedRef =", Key.create(Feed.class, id));
         query = query.limit(limit);
+
+        // load comment like keys of the current parentUserKey.
+        List<Like<Comment>> likes = ofy().load()
+                .type(ClassUtil.<Like<Comment>>castClass(Like.class))
+                .ancestor(Key.create(user.getUserId()))
+                .list();
 
         QueryResultIterator<Comment> queryIterator = query.iterator();
         List<Comment> commentList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             commentList.add(queryIterator.next());
         }
+
+        // Set likes
+        for (Like<Comment> like : likes) {
+            for (Comment comment : commentList) {
+                if (like.getLikeableEntityKey().equivalent(comment.getKey())) {
+                    comment.setLiked(true);
+                }
+            }
+        }
+
         return CollectionResponse.<Comment>builder()
                 .setItems(commentList)
                 .setNextPageToken(queryIterator.getCursor().toWebSafeString())

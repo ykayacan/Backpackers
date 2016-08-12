@@ -5,20 +5,25 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiClass;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.api.server.spi.response.NotFoundException;
+import com.google.appengine.api.users.User;
 
 import com.yoloo.android.backend.Constants;
-import com.yoloo.android.backend.exception.AlreadyFoundException;
-import com.yoloo.android.backend.exception.InvalidIdException;
-import com.yoloo.android.backend.exception.InvalidTokenException;
-import com.yoloo.android.backend.modal.Account;
-import com.yoloo.android.backend.modal.Comment;
-import com.yoloo.android.backend.modal.Feed;
-import com.yoloo.android.backend.util.EndpointUtil;
-import com.yoloo.android.backend.util.LikeHelper;
+import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
+import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
+import com.yoloo.android.backend.authenticator.YolooAuthenticator;
+import com.yoloo.android.backend.controller.LikeController;
+import com.yoloo.android.backend.controller.LikeManager;
+import com.yoloo.android.backend.model.comment.Comment;
+import com.yoloo.android.backend.model.feed.post.TimelinePost;
+import com.yoloo.android.backend.model.question.Question;
 import com.yoloo.android.backend.validator.Validator;
-import com.yoloo.android.backend.validator.rule.IdValidationRule;
-import com.googlecode.objectify.Key;
+import com.yoloo.android.backend.validator.rule.common.AuthenticationRule;
+import com.yoloo.android.backend.validator.rule.common.IdValidationRule;
+import com.yoloo.android.backend.validator.rule.common.NotFoundRule;
+import com.yoloo.android.backend.validator.rule.like.LikeConflictRule;
+import com.yoloo.android.backend.validator.rule.like.LikeNotFoundRule;
+import com.yoloo.android.backend.validator.rule.like.PostLikeConflictRule;
+import com.yoloo.android.backend.validator.rule.like.PostLikeNotFoundRule;
 
 import java.util.logging.Logger;
 
@@ -39,123 +44,157 @@ import javax.inject.Named;
                 Constants.ANDROID_CLIENT_ID,
                 Constants.IOS_CLIENT_ID,
                 Constants.WEB_CLIENT_ID},
-        audiences = {Constants.AUDIENCE_ID}
+        audiences = {Constants.AUDIENCE_ID},
+        authenticators = {
+                GoogleAuthenticator.class,
+                FacebookAuthenticator.class,
+                YolooAuthenticator.class}
 )
 public class LikeEndpoint {
 
-    private static final Logger logger = Logger.getLogger(LikeEndpoint.class.getName());
+    private static final Logger logger = Logger.getLogger(LikeEndpoint.class.getSimpleName());
 
     /**
      * Adds a new {@code Like}.
      *
-     * @param id          the id of the Feed
-     * @param accessToken the access token
-     * @throws InvalidTokenException the invalid token exception
-     * @throws InvalidIdException    the invalid id exception
-     * @throws AlreadyFoundException the already found exception
+     * @param websafePostId the id of the Feed
+     * @param user       the parentUserKey
+     * @throws ServiceException the service exception
      */
     @ApiMethod(
-            name = "likeFeed",
-            path = "feeds/{id}/likes",
-            httpMethod = ApiMethod.HttpMethod.PUT)
-    public void likeFeed(@Named("id") final long id,
-                         @Named("access_token") final String accessToken) throws ServiceException {
+            name = "posts.like",
+            path = "posts/{post_id}/likes",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public void likePost(@Named("post_id") final String websafePostId, final User user)
+            throws ServiceException {
 
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(id));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(websafePostId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
+                .addRule(new PostLikeConflictRule(websafePostId, user))
+                .validate();
 
-        Key<Account> accountKey = EndpointUtil.isValidToken(accessToken);
-
-        EndpointUtil.checkItemExists(Feed.class, id);
-
-        Key<Feed> feedKey = Key.create(Feed.class, id);
-
-        LikeHelper.likeFeed(feedKey, accountKey);
+        LikeController.newInstance(user, websafePostId).like();
     }
 
     /**
      * Deletes like from Feed.
      *
-     * @param id          the id of the Feed
-     * @param accessToken the access token
-     * @throws InvalidTokenException the invalid token exception
-     * @throws InvalidIdException    the invalid id exception
-     * @throws NotFoundException     the not found exception
+     * @param websafePostId the id of the Post
+     * @param user       the parentUserKey
+     * @throws ServiceException the service exception
      */
     @ApiMethod(
-            name = "unlikeFeed",
-            path = "feeds/{id}/likes",
+            name = "posts.dislike",
+            path = "posts/{post_id}/likes",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void unlikeFeed(@Named("id") final long id,
-                           @Named("access_token") final String accessToken) throws ServiceException {
+    public void dislikePost(@Named("post_id") final String websafePostId, final User user)
+            throws ServiceException {
 
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(id));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(websafePostId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
+                .addRule(new PostLikeNotFoundRule(websafePostId, user))
+                .validate();
 
-        Key<Account> accountKey = EndpointUtil.isValidToken(accessToken);
-        EndpointUtil.checkItemExists(Feed.class, id);
-
-        Key<Feed> feedKey = Key.create(Feed.class, id);
-
-        LikeHelper.unlikeFeed(feedKey, accountKey);
+        LikeController.newInstance(user, websafePostId).dislike();
     }
 
     /**
      * Adds a new {@code Like}.
      *
-     * @param id          the id of the Feed
-     * @param accessToken the access token
-     * @throws InvalidTokenException the invalid token exception
-     * @throws InvalidIdException    the invalid id exception
-     * @throws AlreadyFoundException the already found exception
+     * @param websafeCommentId the id of the Question
+     * @param user      the parentUserKey
+     * @throws ServiceException the service exception
      */
     @ApiMethod(
-            name = "likeComment",
-            path = "comments/{id}/likes",
-            httpMethod = ApiMethod.HttpMethod.PUT)
-    public void likeComment(@Named("id") final long id,
-                            @Named("access_token") final String accessToken) throws ServiceException {
+            name = "comments.like",
+            path = "comments/{comment_id}/likes",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public void likeComment(@Named("comment_id") final String websafeCommentId, final User user)
+            throws ServiceException {
 
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(id));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(websafeCommentId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
+                .addRule(new LikeConflictRule(websafeCommentId, user))
+                .validate();
 
-        Key<Account> accountKey = EndpointUtil.isValidToken(accessToken);
-
-        EndpointUtil.checkItemExists(Comment.class, id);
-
-        Key<Comment> commentKey = Key.create(Comment.class, id);
-
-        LikeHelper.likeComment(commentKey, accountKey);
+        LikeManager.newInstance(Comment.class, websafeCommentId, user).like();
     }
 
     /**
      * Deletes like from Feed.
      *
-     * @param id          the id of the Feed
-     * @param accessToken the access token
-     * @throws InvalidTokenException the invalid token exception
-     * @throws InvalidIdException    the invalid id exception
-     * @throws NotFoundException     the not found exception
+     * @param commentId the id of the Feed
+     * @param user      the parentUserKey
+     * @throws ServiceException the service exception
      */
     @ApiMethod(
-            name = "unlikeComment",
-            path = "comments/{id}/likes",
+            name = "comments.unlike",
+            path = "comments/{comment_id}/likes",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void unlikeComment(@Named("id") final long id,
-                              @Named("access_token") final String accessToken) throws ServiceException {
+    public void unlikeComment(@Named("comment_id") final String commentId, final User user)
+            throws ServiceException {
 
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(id));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(commentId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Comment.class, commentId))
+                .addRule(new LikeNotFoundRule(commentId, user))
+                .validate();
 
-        Key<Account> accountKey = EndpointUtil.isValidToken(accessToken);
-        EndpointUtil.checkItemExists(Comment.class, id);
+        LikeManager.newInstance(Comment.class, commentId, user).unlike();
+    }
 
-        Key<Comment> commentKey = Key.create(Comment.class, id);
+    /**
+     * Adds a new {@code Like}.
+     *
+     * @param questionId the id of the Feed
+     * @param user       the parentUserKey
+     * @throws ServiceException the service exception
+     */
+    @ApiMethod(
+            name = "questions.like",
+            path = "questions/{question_id}/likes",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public void likeQuestion(@Named("question_id") final String questionId, final User user)
+            throws ServiceException {
 
-        LikeHelper.unlikeComment(commentKey, accountKey);
+        Validator.builder()
+                .addRule(new IdValidationRule(questionId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Question.class, questionId))
+                .addRule(new LikeConflictRule(questionId, user))
+                .validate();
+
+        LikeManager.newInstance(Question.class, questionId, user).like();
+    }
+
+    /**
+     * Deletes like from Feed.
+     *
+     * @param questionId the id of the Question
+     * @param user       the parentUserKey
+     * @throws ServiceException the service exception
+     */
+    @ApiMethod(
+            name = "questions.dislike",
+            path = "questions/{question_id}/likes",
+            httpMethod = ApiMethod.HttpMethod.DELETE)
+    public void dislikeQuestion(@Named("question_id") final String questionId, final User user)
+            throws ServiceException {
+
+        Validator.builder()
+                .addRule(new IdValidationRule(questionId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Question.class, questionId))
+                .addRule(new LikeNotFoundRule(questionId, user))
+                .validate();
+
+        LikeManager.newInstance(Question.class, questionId, user).unlike();
     }
 }

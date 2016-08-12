@@ -3,6 +3,9 @@ package com.yoloo.android;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
+import com.raizlabs.android.dbflow.config.FlowConfig;
+import com.raizlabs.android.dbflow.config.FlowManager;
+
 import android.app.Application;
 
 import timber.log.Timber;
@@ -17,6 +20,8 @@ public class App extends Application {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+
+        FlowManager.init(new FlowConfig.Builder(this).build());
     }
 
     /**

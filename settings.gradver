@@ -1,0 +1,9 @@
+{
+    "build_files": [
+        "E:\\AndroidProjects\\Yoloo\\build.gradle",
+        "E:\\AndroidProjects\\Yoloo\\app\\build.gradle",
+        "E:\\AndroidProjects\\Yoloo\\tardis\\build.gradle",
+        "E:\\AndroidProjects\\Yoloo\\backend\\build.gradle",
+        "E:\\AndroidProjects\\Yoloo\\backend\\build\\tmp\\appengineEndpointsExpandClientLibs\\yolooApi-v1-java.zip-unzipped\\yolooApi\\build.gradle"
+    ]
+}

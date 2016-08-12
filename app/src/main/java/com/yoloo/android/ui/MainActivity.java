@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             try {
-                return sFeedApi.create(mFeed).execute();
+                return sFeedApi.save(mFeed).execute();
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;

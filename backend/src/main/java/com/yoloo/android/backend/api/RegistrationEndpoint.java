@@ -13,7 +13,7 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.response.CollectionResponse;
 
 import com.yoloo.android.backend.Constants;
-import com.yoloo.android.backend.modal.RegistrationRecord;
+import com.yoloo.android.backend.model.RegistrationRecord;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -57,7 +57,7 @@ public class RegistrationEndpoint {
      * Registers a device to the backend.
      *
      * @param regId The Google Cloud Messaging registration id to add.
-     *              user is unauthenticated
+     *              parentUserKey is unauthenticated
      */
     @ApiMethod(httpMethod = "POST")
     public void registerDevice(@Named("regId") String regId) {
@@ -74,7 +74,7 @@ public class RegistrationEndpoint {
      * Unregisters a device from the backend.
      *
      * @param regId The Google Cloud Messaging registration Id to remove     *
-     *              user is unauthorized
+     *              parentUserKey is unauthorized
      */
     @ApiMethod(httpMethod = "DELETE")
     public void unregisterDevice(@Named("regId") String regId) {

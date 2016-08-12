@@ -1,12 +1,14 @@
 package com.yoloo.android.ui.login;
 
-import com.yoloo.android.tardis.base.view.MvpView;
+import com.hannesdorfmann.mosby.mvp.MvpView;
 
-public interface LoginView extends MvpView {
+import android.content.Intent;
 
-    void showLoading();
+interface LoginView extends MvpView {
 
-    void showContent();
+    void onShowProgressDialog(boolean show);
 
-    void setData(String text);
+    void navigateToHome();
+
+    void onStartActivityForResult(Intent intent);
 }

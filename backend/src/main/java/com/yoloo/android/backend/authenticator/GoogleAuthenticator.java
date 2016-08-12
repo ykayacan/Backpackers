@@ -1,18 +1,22 @@
 package com.yoloo.android.backend.authenticator;
 
+import com.google.api.client.util.Strings;
 import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.config.Authenticator;
+import com.google.appengine.api.datastore.Email;
 import com.google.appengine.repackaged.com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.appengine.repackaged.com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.appengine.repackaged.com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.appengine.repackaged.com.google.api.client.json.jackson2.JacksonFactory;
 
-import com.yoloo.android.backend.modal.Account;
+import com.googlecode.objectify.Key;
+import com.yoloo.android.backend.Constants;
+import com.yoloo.android.backend.model.user.Account;
+import com.yoloo.android.backend.oauth2.OAuth;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,51 +24,51 @@ import static com.yoloo.android.backend.service.OfyHelper.ofy;
 
 public class GoogleAuthenticator implements Authenticator {
 
-    private static final Logger logger = Logger.getLogger(GoogleAuthenticator.class.getName());
+    private static GoogleIdTokenVerifier getVerifier() {
+        return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                .setAudience(Collections.singletonList(Constants.WEB_CLIENT_ID))
+                .setIssuer("https://accounts.google.com")
+                .build();
+    }
+
+    public static GoogleIdToken.Payload processGoogleToken(String idToken) {
+        try {
+            GoogleIdToken googleIdToken = getVerifier().verify(idToken);
+            if (googleIdToken != null) {
+                return googleIdToken.getPayload();
+            }
+        } catch (GeneralSecurityException | IOException ignored) {
+
+        }
+
+        return null;
+    }
 
     @Override
     public User authenticate(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token != null) {
-            String userEmail = processGoogleToken(token);
-            if (userEmail != null) {
-                return new User(userEmail);
-            }
-        }
-        return null;
-    }
+        final String authzHeader = request.getHeader(OAuth.HeaderType.AUTHORIZATION);
 
-    private String processGoogleToken(String idToken) {
-        NetHttpTransport transport = new NetHttpTransport();
-
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport,
-                new JacksonFactory())
-                // TODO: 1.06.2016 add audience
-                .setAudience(Collections.singletonList(""))
-                .setIssuer("https://accounts.google.com")
-                .build();
-
-        try {
-            GoogleIdToken googleIdToken = verifier.verify(idToken);
-            if (googleIdToken != null) {
-                saveProfile(googleIdToken.getPayload());
-                return googleIdToken.getPayload().getEmail();
-            }
-        } catch (GeneralSecurityException | IOException e) {
-            logger.info(e.getMessage());
+        if (Strings.isNullOrEmpty(authzHeader) ||
+                authzHeader.contains(OAuth.OAUTH_HEADER_NAME)) {
+            return null;
         }
 
-        return null;
+        GoogleIdToken.Payload payload = processGoogleToken(authzHeader);
+        if (payload == null) {
+            return null;
+        }
+
+        Key<Account> accountKey = getAccountKeyByEmail(payload.getEmail());
+        if (accountKey == null) {
+            return null;
+        }
+
+        return new User(accountKey.toWebSafeString(), "");
     }
 
-    private void saveProfile(GoogleIdToken.Payload payload) {
-        Account a = new Account.Builder()
-                .setUsername((String) payload.get("name"))
-                .setRealname((String) payload.get("given_name"))
-                .setEmail(payload.getEmail())
-                .setPictureUrl((String) payload.get("picture"))
-                .build();
-
-        ofy().save().entity(a).now();
+    private static Key<Account> getAccountKeyByEmail(String email) {
+        return ofy().load().type(Account.class)
+                .filter("email", new Email(email))
+                .keys().first().now();
     }
 }

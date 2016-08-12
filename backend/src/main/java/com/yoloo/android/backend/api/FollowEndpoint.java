@@ -9,18 +9,26 @@ import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.users.User;
 
-import com.yoloo.android.backend.Constants;
-import com.yoloo.android.backend.modal.Account;
-import com.yoloo.android.backend.modal.Follow;
-import com.yoloo.android.backend.util.EndpointUtil;
-import com.yoloo.android.backend.util.FollowHelper;
-import com.yoloo.android.backend.validator.Validator;
-import com.yoloo.android.backend.validator.rule.IdValidationRule;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
+import com.yoloo.android.backend.Constants;
+import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
+import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
+import com.yoloo.android.backend.authenticator.YolooAuthenticator;
+import com.yoloo.android.backend.controller.UserController;
+import com.yoloo.android.backend.model.follow.Follow;
+import com.yoloo.android.backend.model.user.Account;
+import com.yoloo.android.backend.validator.Validator;
+import com.yoloo.android.backend.validator.rule.common.AuthenticationRule;
+import com.yoloo.android.backend.validator.rule.common.IdValidationRule;
+import com.yoloo.android.backend.validator.rule.common.NotFoundRule;
+import com.yoloo.android.backend.validator.rule.follow.FollowConflictRule;
+import com.yoloo.android.backend.validator.rule.follow.FollowNotFoundRule;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,7 +36,6 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import static com.yoloo.android.backend.service.OfyHelper.ofy;
-import static com.yoloo.android.backend.util.EndpointUtil.isValidToken;
 
 @Api(
         name = "yolooApi",
@@ -45,11 +52,16 @@ import static com.yoloo.android.backend.util.EndpointUtil.isValidToken;
                 Constants.ANDROID_CLIENT_ID,
                 Constants.IOS_CLIENT_ID,
                 Constants.WEB_CLIENT_ID},
-        audiences = {Constants.AUDIENCE_ID}
+        audiences = {Constants.AUDIENCE_ID},
+        authenticators = {
+                GoogleAuthenticator.class,
+                FacebookAuthenticator.class,
+                YolooAuthenticator.class}
 )
 public class FollowEndpoint {
 
-    private static final Logger logger = Logger.getLogger(FollowEndpoint.class.getName());
+    private static final Logger logger =
+            Logger.getLogger(FollowEndpoint.class.getSimpleName());
 
     private static final int DEFAULT_LIST_LIMIT = 20;
 
@@ -58,22 +70,19 @@ public class FollowEndpoint {
      */
     @ApiMethod(
             name = "follow",
-            path = "accounts/{id}/follows",
+            path = "users/{user_id}/follows",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public void follow(@Named("id") final long followeeId,
-                       @Named("access_token") final String accessToken) throws
-            ServiceException {
+    public void follow(@Named("user_id") final String followeeId, final User user)
+            throws ServiceException {
 
-        // Validate.
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(followeeId));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(followeeId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Account.class, followeeId))
+                .addRule(new FollowConflictRule(followeeId, user))
+                .validate();
 
-        Key<Account> followerKey = isValidToken(accessToken);
-
-        EndpointUtil.checkItemExists(Account.class, followeeId);
-
-        FollowHelper.follow(Key.create(Account.class, followeeId), followerKey);
+        UserController.newInstance().follow(followeeId, user);
     }
 
     /**
@@ -85,21 +94,19 @@ public class FollowEndpoint {
      */
     @ApiMethod(
             name = "unfollow",
-            path = "accounts/{id}/follows",
+            path = "users/{user_id}/follows",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") final long followeeId,
-                       @Named("access_token") final String accessToken) throws ServiceException {
+    public void unfollow(@Named("user_id") final String followeeId, final User user)
+            throws ServiceException {
 
-        // Validate.
-        Validator validator = Validator.get();
-        validator.addRule(new IdValidationRule(followeeId));
-        validator.validate();
+        Validator.builder()
+                .addRule(new IdValidationRule(followeeId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(Account.class, followeeId))
+                .addRule(new FollowNotFoundRule(followeeId, user))
+                .validate();
 
-        Key<Account> accountKey = isValidToken(accessToken);
-
-        EndpointUtil.checkItemExists(Account.class, followeeId);
-
-        FollowHelper.unfollow(Key.create(Account.class, followeeId), accountKey);
+        UserController.newInstance().unfollow(followeeId, user);
     }
 
     /**
@@ -110,30 +117,55 @@ public class FollowEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "listFollows",
-            path = "accounts/{id}/follows",
+            name = "follows.list",
+            path = "users/{user_id}/follows",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Follow> list(@Named("id") final long followerId,
-                                           @Named("type") final String type,
-                                           @Nullable @Named("cursor") String cursor,
-                                           @Nullable @Named("limit") Integer limit) {
+    public CollectionResponse<Account> list(@Named("user_id") String userId,
+                                            @Named("type") final String type,
+                                            @Nullable @Named("cursor") String cursor,
+                                            @Nullable @Named("limit") Integer limit,
+                                            final User user) throws ServiceException {
+        Validator.builder()
+                .addRule(new AuthenticationRule(user))
+                .validate();
+
+        Key<Account> parentUserKey = Key.create(userId);
+
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
+
         Query<Follow> query = ofy().load().type(Follow.class);
+
+        switch (type) {
+            case "followee":
+                query = query.ancestor(parentUserKey);
+                break;
+            case "follower":
+                query = query.filter("followeeKey =", parentUserKey);
+                break;
+            default:
+                break;
+        }
+
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
-        }
-        if (type.contentEquals("follower")) {
-            query = query.filter("followerRef =", Key.create(Follow.class, followerId));
-        } else if (type.contentEquals("followee")) {
-            query = query.filter("followeeRef =", Key.create(Follow.class, followerId));
         }
         query = query.limit(limit);
 
         QueryResultIterator<Follow> queryIterator = query.iterator();
-        List<Follow> followList = new ArrayList<Follow>(limit);
+        List<Key<Account>> followKeys = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
-            followList.add(queryIterator.next());
+            if (type.contentEquals("follower")) {
+                followKeys.add(queryIterator.next().getParentUserKey());
+            } else if (type.contentEquals("followee")) {
+                followKeys.add(queryIterator.next().getFolloweeKey());
+            }
         }
-        return CollectionResponse.<Follow>builder().setItems(followList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
+
+        Collection<Account> users = ofy().load().keys(followKeys).values();
+
+        return CollectionResponse.<Account>builder()
+                .setItems(users)
+                .setNextPageToken(queryIterator.getCursor().toWebSafeString())
+                .build();
     }
 }

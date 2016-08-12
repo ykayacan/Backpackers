@@ -1,24 +1,20 @@
 package com.yoloo.android.data.repository;
 
-import com.yoloo.android.data.Specification;
+import com.yoloo.android.data.repository.specification.Specification;
 
 import java.util.List;
 
 import rx.Observable;
 
-public abstract class Repository<M> {
+public interface Repository<M> {
 
-    public abstract void create(M item);
+    void create(M item);
 
-    public void create(Iterable<M> items) {
-    }
+    void update(M item);
 
-    public abstract void update(M item);
+    void delete(M item);
 
-    public abstract void delete(M item);
+    void delete(Specification specification);
 
-    public void delete(Specification specification) {
-    }
-
-    public abstract Observable<List<M>> query(Specification specification);
+    Observable<List<M>> query(Specification specification);
 }

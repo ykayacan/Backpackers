@@ -8,32 +8,39 @@ import java.util.List;
 
 public class Validator {
 
-    private static Validator sValidator;
-
     private List<Rule> rules = new ArrayList<>(0);
 
-    public static Validator get() {
-        if (sValidator == null) {
-            sValidator = new Validator();
-        }
-        return sValidator;
+    public Validator(Builder builder) throws ServiceException {
+        this.rules = builder.rules;
+        validateRules();
     }
 
-    private Validator() {
+    public static Validator.Builder builder() {
+        return new Validator.Builder();
     }
 
-    public void addRule(Rule rule) {
-        this.rules.add(rule);
-    }
-
-    public void addRules(List<Rule> rules) {
-        this.rules = rules;
-    }
-
-    public void validate() throws ServiceException {
+    private void validateRules() throws ServiceException {
         Preconditions.checkNotNull(this.rules, "Rule is empty.");
         for (Rule rule : rules) {
             rule.validate();
+        }
+    }
+
+    public static final class Builder {
+        private List<Rule> rules = new ArrayList<>(0);
+
+        public Builder addRule(Rule rule) {
+            this.rules.add(rule);
+            return this;
+        }
+
+        public Builder addRules(List<Rule> rules) {
+            this.rules.addAll(rules);
+            return this;
+        }
+
+        public Validator validate() throws ServiceException {
+            return new Validator(this);
         }
     }
 }

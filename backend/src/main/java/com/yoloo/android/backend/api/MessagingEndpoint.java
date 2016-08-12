@@ -14,7 +14,7 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 
 import com.yoloo.android.backend.Constants;
-import com.yoloo.android.backend.modal.RegistrationRecord;
+import com.yoloo.android.backend.model.RegistrationRecord;
 import com.yoloo.android.backend.service.OfyHelper;
 
 import java.io.IOException;

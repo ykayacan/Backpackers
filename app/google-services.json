@@ -1,19 +1,19 @@
 {
   "project_info": {
-    "project_number": "369106561777",
-    "project_id": "yoloo-967be"
+    "project_number": "156968448687",
+    "project_id": "yoloo-app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:369106561777:android:9ba7b4c8da97a4ad",
+        "mobilesdk_app_id": "1:156968448687:android:9ba7b4c8da97a4ad",
         "android_client_info": {
           "package_name": "com.yoloo.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "369106561777-r0jg5h20eeuhho2gha25e5m2rmf66pd8.apps.googleusercontent.com",
+          "client_id": "156968448687-2nqm11mo5b99jfaimqboltte4h1dd94o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.yoloo.android",
@@ -21,13 +21,13 @@
           }
         },
         {
-          "client_id": "369106561777-8cqi3ujggnjc723tqgmrm7i1ip5v215q.apps.googleusercontent.com",
+          "client_id": "156968448687-8pamascp1u8kht9qrhonuq47kndst6k8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBMCCfYnLhrIymBgLE1apuI0oxFXbeARLg"
+          "current_key": "AIzaSyAs0AwU26ComSZcPQ2jEA9j3JoHYJBtWeo"
         }
       ],
       "services": {

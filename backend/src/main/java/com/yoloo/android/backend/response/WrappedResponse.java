@@ -1,59 +1,69 @@
 package com.yoloo.android.backend.response;
 
-import com.google.api.server.spi.response.CollectionResponse;
+public class WrappedResponse implements Response {
+    private int code;
+    private Status status;
+    private String message;
+    private Object item;
 
-import java.util.Collection;
-
-public class WrappedResponse<T> extends CollectionResponse<T> {
-    private final int status;
-    private final String message;
-
-    public static <T> WrappedResponse.Builder<T> builder() {
-        return new WrappedResponse.Builder<>();
+    private WrappedResponse() {
     }
 
-    private WrappedResponse(int status, String message, Collection<T> items, String nextPageToken) {
-        super(items, nextPageToken);
-        this.status = status;
-        this.message = message;
+    private WrappedResponse(Builder builder) {
+        this.code = builder.code;
+        this.status = builder.status;
+        this.message = builder.message;
+        this.item = builder.item;
+    }
+
+    public static WrappedResponse.Builder builder() {
+        return new WrappedResponse.Builder();
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public int getStatus() {
-        return status;
+    public Object getItem() {
+        return item;
     }
 
-    public static class Builder<T> extends CollectionResponse.Builder<T> {
-        private int status;
+    public static final class Builder {
+        private int code;
+        private Status status;
         private String message;
-        private Collection<T> items;
-        private String nextPageToken;
+        private Object item;
 
-        public WrappedResponse.Builder<T> setStatus(int status) {
+        public Builder setCode(int code) {
+            this.code = code;
+            return this;
+        }
+
+        public Builder setStatus(Status status) {
             this.status = status;
             return this;
         }
 
-        public WrappedResponse.Builder<T> setMessage(String message) {
+        public Builder setMessage(String message) {
             this.message = message;
             return this;
         }
 
-        public WrappedResponse.Builder<T> setItems(Collection<T> items) {
-            this.items = items;
+        public Builder setItem(Object item) {
+            this.item = item;
             return this;
         }
 
-        public WrappedResponse.Builder<T> setNextPageToken(String nextPageToken) {
-            this.nextPageToken = nextPageToken;
-            return this;
-        }
-
-        public WrappedResponse<T> build() {
-            return new WrappedResponse<>(this.status, this.message, this.items, this.nextPageToken);
+        public WrappedResponse build() {
+            return new WrappedResponse(this);
         }
     }
 }

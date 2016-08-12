@@ -11,12 +11,12 @@ public final class Constants {
     /**
      * Google Cloud Messaging API key.
      */
-    public static final String GCM_API_KEY = "YOUR-GCM-API-KEY";
+    public static final String GCM_API_KEY = "AIzaSyCectOS_wSvb9rIsnLMfJH9F25yXrIfrJo";
 
     /**
      * Android client ID from Google Cloud console.
      */
-    public static final String ANDROID_CLIENT_ID = "369106561777-r0jg5h20eeuhho2gha25e5m2rmf66pd8.apps.googleusercontent.com";
+    public static final String ANDROID_CLIENT_ID = "156968448687-2nqm11mo5b99jfaimqboltte4h1dd94o.apps.googleusercontent.com";
 
     /**
      * iOS client ID from Google Cloud console.
@@ -26,7 +26,9 @@ public final class Constants {
     /**
      * Web client ID from Google Cloud console.
      */
-    public static final String WEB_CLIENT_ID = "369106561777-8cqi3ujggnjc723tqgmrm7i1ip5v215q.apps.googleusercontent.com";
+    public static final String WEB_CLIENT_ID = "156968448687-8pamascp1u8kht9qrhonuq47kndst6k8.apps.googleusercontent.com";
+
+    public static final String BASE64_CLIENT_ID = "MTU2OTY4NDQ4Njg3LThwYW1hc2NwMXU4a2h0OXFyaG9udXE0N2tuZHN0Nms4LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t";
 
     /**
      * Audience ID used to limit access to some client to the API.
@@ -39,12 +41,14 @@ public final class Constants {
     /**
      * API package name.
      */
-    public static final String API_OWNER =
-            "modal.backend.android.yoloo.com";
+    public static final String API_OWNER = "modal.backend.android.yoloo.com";
+
     /**
      * API package path.
      */
     public static final String API_PACKAGE_PATH = "";
+
+    public static final long TOKEN_EXPIRES_IN = 86400; // 24 hours in seconds.
 
     private Constants() {
     }

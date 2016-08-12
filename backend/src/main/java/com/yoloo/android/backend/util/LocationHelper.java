@@ -14,7 +14,10 @@ import com.google.appengine.api.search.SearchServiceFactory;
 import com.google.appengine.api.search.SortExpression;
 import com.google.appengine.api.search.SortOptions;
 
-import com.yoloo.android.backend.modal.location.LocationInfo;
+import com.googlecode.objectify.Key;
+import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.location.Location;
+import com.yoloo.android.backend.model.location.LocationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,10 +113,10 @@ public final class LocationHelper {
     }
 
     /**
-     * Returns the nearest places to the location of the user.
+     * Returns the nearest places to the location of the parentUserKey.
      *
-     * @param location         the location of the user.
-     * @param distanceInMeters the maximum distance to the user.
+     * @param location         the location of the parentUserKey.
+     * @param distanceInMeters the maximum distance to the parentUserKey.
      * @param resultCount      the maximum number of places returned.
      * @return List of up to resultCount places in the datastore ordered by
      * the distance to the location parameter and less than
@@ -168,12 +171,14 @@ public final class LocationHelper {
             GeoPoint p = document.getOnlyField("place_location").getGeoPoint();
 
             LocationInfo place = new LocationInfo();
+
             /*place.setPlaceId(Long.valueOf(document.getOnlyField("id")
                     .getText()));*/
             place.setName(document.getOnlyField("name").getText());
             //place.setAddress(document.getOnlyField("address").getText());
 
-            place.setGeoPt((float) p.getLatitude(), (float) p.getLongitude());
+            place.setGeoPt(new GeoPt((float) p.getLatitude(),
+                    (float) p.getLongitude()));
 
             // GeoPoints are not implemented on dev server and latitude and
             // longitude are set to zero
@@ -225,5 +230,30 @@ public final class LocationHelper {
         return EARTH_RADIUS * Math
                 .acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1)
                         * Math.cos(lat2) * Math.cos(Math.abs(long1 - long2)));
+    }
+
+    public static GeoPt createLocationFromString(String latLng) {
+        final List<String> coords = StringUtil.splitValueByToken(latLng, ",");
+
+        return new GeoPt(Float.valueOf(coords.get(0)), Float.valueOf(coords.get(1)));
+    }
+
+    public static List<Location> getLocations(String locationArgs,
+                                               Key<? extends Post> feedKey) {
+        List<String> locationParts = StringUtil.splitValueByToken(locationArgs, ";");
+        List<Location> locations = new ArrayList<>(3);
+        for (String part : locationParts) {
+            List<String> block = StringUtil.splitValueByToken(part, ":");
+
+            Location location = Location.builder()
+                    .setPostKey(feedKey)
+                    .setName(block.get(0))
+                    .setGeoPt(LocationHelper.createLocationFromString(block.get(1)))
+                    .build();
+
+            locations.add(location);
+        }
+
+        return locations;
     }
 }
