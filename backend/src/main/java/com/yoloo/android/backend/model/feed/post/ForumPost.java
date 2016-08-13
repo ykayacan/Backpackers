@@ -28,8 +28,8 @@ import java.util.Set;
 
 @Entity
 @Cache
-@JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "content", "hashtags",
-        "locations", "status", "ups", "downs", "commentCount", "reportCount",
+@JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "type", "content",
+        "hashtags", "locations", "status", "ups", "downs", "commentCount", "reportCount",
         "reportedBy", "awardedBy", "awardRep", "locked", "accepted", "createdAt", "updatedAt"})
 public class ForumPost extends Post implements Commentable {
 

@@ -8,6 +8,7 @@ import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonPropert
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 import com.yoloo.android.backend.model.Photo;
@@ -61,6 +62,11 @@ public class Post implements Likeable {
      */
     @Index
     protected Date createdAt;
+
+    // Extra fields
+
+    @Ignore
+    private String type;
 
     // Methods
 
@@ -142,6 +148,21 @@ public class Post implements Likeable {
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public String getType() {
+        switch (getClass().getSimpleName()) {
+            case "TimelinePost":
+                type = "post";
+                break;
+            case "AdsPost":
+                type = "ads";
+                break;
+            case "ForumPost":
+                type = "question";
+                break;
+        }
+        return type;
     }
 
     public static abstract class Builder<T extends Post> {

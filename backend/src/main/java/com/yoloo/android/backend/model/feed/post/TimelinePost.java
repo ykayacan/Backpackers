@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "content",
+@JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "type", "content",
         "hashtags", "locations", "liked", "likeCount", "commentCount", "reportCount",
         "reportedBy", "createdAt", "updatedAt"})
 public class TimelinePost extends Post implements Commentable {
@@ -90,6 +90,10 @@ public class TimelinePost extends Post implements Commentable {
         return reportedByKeys;
     }
 
+    public void setReportedByKeys(Set<Key<Account>> reportedByKeys) {
+        this.reportedByKeys = reportedByKeys;
+    }
+
     @JsonProperty("reportedBy")
     public List<String> getReportedByIds() {
         if (reportedByKeys == null) {
@@ -101,10 +105,6 @@ public class TimelinePost extends Post implements Commentable {
             reportIds.add(key.toWebSafeString());
         }
         return reportIds;
-    }
-
-    public void setReportedByKeys(Set<Key<Account>> reportedByKeys) {
-        this.reportedByKeys = reportedByKeys;
     }
 
     public Link getVideoUrl() {
