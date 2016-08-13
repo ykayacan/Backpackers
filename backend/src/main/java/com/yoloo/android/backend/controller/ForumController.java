@@ -1,7 +1,6 @@
 package com.yoloo.android.backend.controller;
 
 import com.google.api.client.util.Strings;
-import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
@@ -14,10 +13,13 @@ import com.googlecode.objectify.LoadResult;
 import com.googlecode.objectify.cmd.Query;
 import com.yoloo.android.backend.PostFactory;
 import com.yoloo.android.backend.model.feed.post.ForumPost;
+import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
 import com.yoloo.android.backend.model.user.UserCounterShard;
 import com.yoloo.android.backend.model.vote.Vote;
+import com.yoloo.android.backend.servlet.CreateTimelineServlet;
 import com.yoloo.android.backend.util.LocationHelper;
 import com.yoloo.android.backend.util.StringUtil;
 import com.yoloo.android.backend.util.VoteHelper;
@@ -76,6 +78,8 @@ public class ForumController {
                          final User user) {
         // Create parent user key.
         final Key<Account> userKey = Key.create(user.getUserId());
+        final LoadResult<Key<Follow>> followResult = ofy().load().type(Follow.class)
+                .filter("followeeKey =", userKey).keys().first();
 
         // Get related account.
         final Account account = ofy().load().key(userKey).now();
@@ -103,6 +107,8 @@ public class ForumController {
 
         // Batch save entities
         ofy().save().entities(saveList);
+
+        writeToFollowersTimeline(userKey, followResult, post);
 
         return post;
     }
@@ -183,15 +189,6 @@ public class ForumController {
         ofy().save().entity(shard);
     }
 
-    /**
-     * List collection response.
-     *
-     * @param cursor the cursor
-     * @param limit  the limit
-     * @param user   the user
-     * @return the collection response
-     * @throws ServiceException the service exception
-     */
     public CollectionResponse<ForumPost> list(final String sort,
                                               final String cursor,
                                               Integer limit,
@@ -218,15 +215,16 @@ public class ForumController {
         final QueryResultIterator<ForumPost> queryIterator = query.iterator();
 
         // Store async batch in a hashmap. LinkedHashMap preserve insertion order.
-        final Map<Key<ForumPost>, List<LoadResult<Key<Vote>>>> votedKeysMap =
+        final Map<Key<? extends Post>, List<LoadResult<Key<Vote>>>> votedKeysMap =
                 new LinkedHashMap<>(limit);
+
         final List<ForumPost> posts = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             // Get post key.
             final ForumPost post = queryIterator.next();
             posts.add(post);
-            votedKeysMap.put(post.getKey(),
-                    VoteHelper.loadAsyncVoteKeys(userKey, post.getKey()));
+
+            votedKeysMap.put(post.getKey(), VoteHelper.loadAsyncVoteKeys(userKey, post.getKey()));
         }
 
         VoteHelper.aggregateVotes(posts, votedKeysMap);
@@ -316,5 +314,18 @@ public class ForumController {
 
         shard.setQuestionCount(shard.getQuestionCount() + 1);
         return shard;
+    }
+
+    private void writeToFollowersTimeline(Key<Account> userKey,
+                                          LoadResult<Key<Follow>> followResult,
+                                          Post post) {
+        // The user is followed by someone.
+        if (followResult.now() != null) {
+            // Write post to user's followers timeline.
+            CreateTimelineServlet.create(
+                    userKey.toWebSafeString(),
+                    post.getWebsafeId(),
+                    String.valueOf(post.getCreatedAt().getTime()));
+        }
     }
 }

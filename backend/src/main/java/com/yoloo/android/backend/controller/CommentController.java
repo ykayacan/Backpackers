@@ -57,6 +57,6 @@ public class CommentController {
                 .addAll(likeKeys)
                 .build();
 
-        ofy().save().entities(deleteList);
+        ofy().delete().entities(deleteList);
     }
 }

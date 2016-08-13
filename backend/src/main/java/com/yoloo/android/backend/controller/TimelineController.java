@@ -1,7 +1,6 @@
 package com.yoloo.android.backend.controller;
 
 import com.google.api.client.util.Strings;
-import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
@@ -77,6 +76,8 @@ public class TimelineController {
                     final User user) {
         // Create parent user key.
         final Key<Account> userKey = Key.create(user.getUserId());
+        final LoadResult<Key<Follow>> followResult = ofy().load().type(Follow.class)
+                .filter("followeeKey =", userKey).keys().first();
 
         // Get related account.
         final Account account = ofy().load().key(userKey).now();
@@ -95,7 +96,7 @@ public class TimelineController {
         final TimelineFeed feed =
                 TimelineFeed.newInstance(userKey, postKey, post.getCreatedAt());
 
-        writeToFollowersTimeline(userKey, postKey, post);
+        writeToFollowersTimeline(userKey, followResult, post);
 
         // Add all entities to an immutable list.
         List<Object> saveList = ImmutableList.builder()
@@ -173,16 +174,6 @@ public class TimelineController {
         RemoveTimelineServlet.create(websafePostId);
     }
 
-    /**
-     * List collection response.
-     *
-     * @param websafeUserId the websafe user key
-     * @param cursor        the cursor
-     * @param limit         the limit
-     * @param user          the user
-     * @return the collection response
-     * @throws ServiceException the service exception
-     */
     public CollectionResponse<Post> list(final String websafeUserId,
                                          final String cursor,
                                          Integer limit,
@@ -271,17 +262,14 @@ public class TimelineController {
     }
 
     private void writeToFollowersTimeline(Key<Account> userKey,
-                                          Key<TimelinePost> postKey,
-                                          TimelinePost post) {
-        final Key<Follow> followKey = ofy().load().type(Follow.class)
-                .filter("followeeKey =", userKey).keys().first().now();
-
+                                          LoadResult<Key<Follow>> followResult,
+                                          Post post) {
         // The user is followed by someone.
-        if (followKey != null) {
+        if (followResult.now() != null) {
             // Write post to user's followers timeline.
             CreateTimelineServlet.create(
                     userKey.toWebSafeString(),
-                    postKey.toWebSafeString(),
+                    post.getWebsafeId(),
                     String.valueOf(post.getCreatedAt().getTime()));
         }
     }

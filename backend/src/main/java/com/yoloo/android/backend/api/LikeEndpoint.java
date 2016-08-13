@@ -12,8 +12,6 @@ import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
 import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
 import com.yoloo.android.backend.authenticator.YolooAuthenticator;
 import com.yoloo.android.backend.controller.LikeController;
-import com.yoloo.android.backend.model.comment.Comment;
-import com.yoloo.android.backend.model.feed.post.TimelinePost;
 import com.yoloo.android.backend.validator.Validator;
 import com.yoloo.android.backend.validator.rule.common.AuthenticationRule;
 import com.yoloo.android.backend.validator.rule.common.IdValidationRule;
@@ -68,7 +66,7 @@ public class LikeEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
+                .addRule(new NotFoundRule(websafePostId))
                 .addRule(new LikeConflictRule(websafePostId, user))
                 .validate();
 
@@ -92,7 +90,7 @@ public class LikeEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
+                .addRule(new NotFoundRule(websafePostId))
                 .addRule(new LikeNotFoundRule(websafePostId, user))
                 .validate();
 
@@ -116,7 +114,7 @@ public class LikeEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafeCommentId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
+                .addRule(new NotFoundRule(websafeCommentId))
                 .addRule(new LikeConflictRule(websafeCommentId, user))
                 .validate();
 
@@ -140,7 +138,7 @@ public class LikeEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafeCommentId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
+                .addRule(new NotFoundRule(websafeCommentId))
                 .addRule(new LikeNotFoundRule(websafeCommentId, user))
                 .validate();
 

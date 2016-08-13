@@ -1,14 +1,12 @@
 package com.yoloo.android.backend.servlet;
 
-import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.cmd.Query;
 import com.yoloo.android.backend.model.feed.TimelineFeed;
-import com.yoloo.android.backend.model.feed.post.TimelinePost;
+import com.yoloo.android.backend.model.feed.post.Post;
 import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.user.Account;
 
@@ -53,13 +51,12 @@ public class CreateTimelineServlet extends HttpServlet {
         final String createdAt = req.getParameter(CREATED_AT);
 
         final Key<Account> userKey = Key.create(websafeUserId);
-        final Key<TimelinePost> postKey = Key.create(websafePostId);
+        final Key<? extends Post> postKey = Key.create(websafePostId);
 
         // Get current user's follower keys.
         final List<Key<Account>> followerKeys = getFollowerKeys(userKey);
 
-        final List<TimelineFeed> feeds =
-                new ArrayList<>(followerKeys.size());
+        final List<TimelineFeed> feeds = new ArrayList<>(followerKeys.size());
 
         final Date date = new Date(Long.parseLong(createdAt));
 
@@ -78,14 +75,13 @@ public class CreateTimelineServlet extends HttpServlet {
     }
 
     private List<Key<Account>> getFollowerKeys(Key<Account> userKey) {
-        // Get user's followers
-        Query<Follow> query =
-                ofy().load().type(Follow.class).filter("followeeKey =", userKey);
+        // Get user's followers.
+        List<Key<Follow>> followKeys = ofy().load().type(Follow.class)
+                .filter("followeeKey =", userKey).keys().list();
 
-        QueryResultIterator<Follow> queryIterator = query.iterator();
-        List<Key<Account>> followerKeys = new ArrayList<>(queryIterator.getIndexList().size());
-        while (queryIterator.hasNext()) {
-            followerKeys.add(queryIterator.next().getParentUserKey());
+        List<Key<Account>> followerKeys = new ArrayList<>(followKeys.size());
+        for (Key<Follow> followKey : followKeys) {
+            followerKeys.add(followKey.<Account>getParent());
         }
 
         return followerKeys;

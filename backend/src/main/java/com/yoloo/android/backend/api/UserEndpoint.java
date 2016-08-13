@@ -61,23 +61,23 @@ public class UserEndpoint {
     /**
      * Returns the {@link Account} with the corresponding ID.
      *
-     * @param id the ID of the entity to be retrieved
+     * @param websafeUserId the ID of the entity to be retrieved
      * @return the entity with the corresponding ID
      * @throws NotFoundException if there is no {@code Account} with the provided ID.
      */
     @ApiMethod(
             name = "users.get",
-            path = "users/{id}",
+            path = "users/{userId}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Account get(@Named("id") final String id, final User user)
+    public Account get(@Named("userId") final String websafeUserId, final User user)
             throws ServiceException {
         Validator.builder()
-                .addRule(new IdValidationRule(id))
+                .addRule(new IdValidationRule(websafeUserId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Account.class, id))
+                .addRule(new NotFoundRule(websafeUserId))
                 .validate();
 
-        return UserController.newInstance().get(id);
+        return UserController.newInstance().get(websafeUserId);
     }
 
     /**
@@ -160,17 +160,16 @@ public class UserEndpoint {
     /**
      * Updates an existing {@code Account}.
      *
-     * @param id      the ID of the entity to be updated
-     * @param account the desired state of the entity
+     * @param websafeUserId      the ID of the entity to be updated
      * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Account}
      */
     @ApiMethod(
             name = "users.update",
-            path = "users/{id}",
+            path = "users/{userId}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Account update(@Named("id") final long id, Account account)
+    public Account update(@Named("userId") final long websafeUserId)
             throws NotFoundException {
         return null;
     }
@@ -188,7 +187,7 @@ public class UserEndpoint {
     public void remove(final User user) throws ServiceException {
         Validator.builder()
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Account.class, user.getUserId()))
+                .addRule(new NotFoundRule(user.getUserId()))
                 .validate();
 
         // TODO: 7.07.2016 Implement parentUserKey delete.

@@ -76,7 +76,7 @@ public class PostEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
+                .addRule(new NotFoundRule(websafePostId))
                 .validate();
 
         return null;
@@ -131,8 +131,8 @@ public class PostEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
-                .addRule(new AllowedToOperate(TimelinePost.class, websafePostId, user, "update"))
+                .addRule(new NotFoundRule(websafePostId))
+                .addRule(new AllowedToOperate(user, websafePostId, AllowedToOperate.Operation.UPDATE))
                 .validate();
 
         return TimelineController.newInstance()
@@ -158,8 +158,8 @@ public class PostEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
-                .addRule(new AllowedToOperate(TimelinePost.class, websafePostId, user, "delete"))
+                .addRule(new NotFoundRule(websafePostId))
+                .addRule(new AllowedToOperate(user, websafePostId, AllowedToOperate.Operation.DELETE))
                 .validate();
 
         TimelineController.newInstance().remove(websafePostId, user);

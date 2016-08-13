@@ -81,7 +81,7 @@ public class ForumEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(ForumPost.class, websafePostId))
+                .addRule(new NotFoundRule(websafePostId))
                 .validate();
 
         return ForumController.newInstance().get(websafePostId, user);
@@ -141,8 +141,8 @@ public class ForumEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(ForumPost.class, websafePostId))
-                .addRule(new AllowedToOperate(ForumPost.class, websafePostId, user, "update"))
+                .addRule(new NotFoundRule(websafePostId))
+                .addRule(new AllowedToOperate(user, websafePostId, AllowedToOperate.Operation.UPDATE))
                 .validate();
 
         return ForumController.newInstance()
@@ -168,8 +168,8 @@ public class ForumEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(ForumPost.class, websafePostId))
-                .addRule(new AllowedToOperate(ForumPost.class, websafePostId, user, "delete"))
+                .addRule(new NotFoundRule(websafePostId))
+                .addRule(new AllowedToOperate(user, websafePostId, AllowedToOperate.Operation.DELETE))
                 .validate();
 
         ForumController.newInstance().remove(websafePostId, user);

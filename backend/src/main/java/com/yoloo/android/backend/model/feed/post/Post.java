@@ -91,6 +91,16 @@ public class Post implements Likeable {
         return Key.create(parentUserKey, this.getClass(), id);
     }
 
+    /**
+     * Gets websafe key.
+     *
+     * @return the websafe key
+     */
+    @JsonProperty("id")
+    public String getWebsafeId() {
+        return getKey().toWebSafeString();
+    }
+
     @JsonProperty("ownerId")
     public String getParentUserKey() {
         return parentUserKey.toWebSafeString();

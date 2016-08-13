@@ -77,16 +77,6 @@ public class TimelinePost extends Post implements Commentable {
         };
     }
 
-    /**
-     * Gets websafe key.
-     *
-     * @return the websafe key
-     */
-    @JsonProperty("id")
-    public String getWebsafeKey() {
-        return getKey().toWebSafeString();
-    }
-
     public Set<String> getHashtags() {
         return hashtags;
     }

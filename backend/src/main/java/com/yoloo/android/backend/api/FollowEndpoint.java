@@ -78,7 +78,7 @@ public class FollowEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(followeeId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Account.class, followeeId))
+                .addRule(new NotFoundRule(followeeId))
                 .addRule(new FollowConflictRule(followeeId, user))
                 .validate();
 
@@ -102,7 +102,7 @@ public class FollowEndpoint {
         Validator.builder()
                 .addRule(new IdValidationRule(followeeId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Account.class, followeeId))
+                .addRule(new NotFoundRule(followeeId))
                 .addRule(new FollowNotFoundRule(followeeId, user))
                 .validate();
 

@@ -19,8 +19,6 @@ import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
 import com.yoloo.android.backend.authenticator.YolooAuthenticator;
 import com.yoloo.android.backend.controller.CommentController;
 import com.yoloo.android.backend.model.comment.Comment;
-import com.yoloo.android.backend.model.feed.post.TimelinePost;
-import com.yoloo.android.backend.model.question.Question;
 import com.yoloo.android.backend.validator.Validator;
 import com.yoloo.android.backend.validator.rule.comment.CommentCreateRule;
 import com.yoloo.android.backend.validator.rule.common.AllowedToOperate;
@@ -81,7 +79,7 @@ public class CommentEndpoint {
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
                 .addRule(new CommentCreateRule(text))
-                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
+                .addRule(new NotFoundRule(websafePostId))
                 .validate();
 
         return CommentController.newInstance().add(websafePostId, text, user);
@@ -102,7 +100,7 @@ public class CommentEndpoint {
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
                 .addRule(new CommentCreateRule(text))
-                .addRule(new NotFoundRule(Question.class, websafePostId))
+                .addRule(new NotFoundRule(websafePostId))
                 .validate();
 
         return CommentController.newInstance().add(websafePostId, text, user);
@@ -122,14 +120,12 @@ public class CommentEndpoint {
                                   @Named("commentId") final String websafeCommentId,
                                   final User user) throws ServiceException {
 
-        // Validate.
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new IdValidationRule(websafeCommentId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
-                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
-                .addRule(new AllowedToOperate(Comment.class, websafeCommentId, user, "delete"))
+                .addRule(new NotFoundRule(websafePostId, websafeCommentId))
+                .addRule(new AllowedToOperate(user, websafeCommentId, AllowedToOperate.Operation.DELETE))
                 .validate();
 
         CommentController.newInstance().remove(websafePostId, websafeCommentId, user);
@@ -149,14 +145,12 @@ public class CommentEndpoint {
                                       @Named("commentId") final String websafeCommentId,
                                       final User user) throws ServiceException {
 
-        // Validate.
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new IdValidationRule(websafeCommentId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Question.class, websafePostId))
-                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
-                .addRule(new AllowedToOperate(Comment.class, websafeCommentId, user, "delete"))
+                .addRule(new NotFoundRule(websafePostId, websafeCommentId))
+                .addRule(new AllowedToOperate(user, websafeCommentId, AllowedToOperate.Operation.DELETE))
                 .validate();
 
         CommentController.newInstance().remove(websafePostId, websafeCommentId, user);
@@ -173,18 +167,19 @@ public class CommentEndpoint {
             name = "questions.comments.list",
             path = "questions/{question_id}/comments",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Comment> list(@Named("question_id") final String questionId,
+    public CollectionResponse<Comment> list(@Named("questionId") final String websafeCommentableId,
                                             @Nullable @Named("cursor") String cursor,
                                             @Nullable @Named("limit") Integer limit,
                                             final User user) throws ServiceException {
+
         Validator.builder()
-                .addRule(new IdValidationRule(questionId))
+                .addRule(new IdValidationRule(websafeCommentableId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Question.class, questionId))
+                .addRule(new NotFoundRule(websafeCommentableId))
                 .validate();
 
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
-        Query<Comment> query = ofy().load().type(Comment.class).ancestor(Key.create(questionId));
+        Query<Comment> query = ofy().load().type(Comment.class).ancestor(Key.create(websafeCommentableId));
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }

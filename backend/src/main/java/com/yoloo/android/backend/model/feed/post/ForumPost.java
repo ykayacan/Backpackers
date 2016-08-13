@@ -102,16 +102,6 @@ public class ForumPost extends Post implements Commentable {
         };
     }
 
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public Key<ForumPost> getKey() {
-        return Key.create(parentUserKey, ForumPost.class, id);
-    }
-
-    @JsonProperty("id")
-    public String getWebsafeKey() {
-        return getKey().toWebSafeString();
-    }
-
     public boolean isLocked() {
         return isLocked;
     }
