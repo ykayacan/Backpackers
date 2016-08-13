@@ -27,6 +27,7 @@ dependencies {
     appengineSdk "com.google.appengine:appengine-java-sdk:$APP_ENGINE_VERSION"
     compile "com.google.appengine:appengine-endpoints:$APP_ENGINE_VERSION"
     compile "com.google.appengine:appengine-endpoints-deps:$APP_ENGINE_VERSION"
+    compile "com.google.appengine:appengine-api-labs:$APP_ENGINE_VERSION"
     compile 'com.google.appengine.tools:appengine-gcs-client:0.6'
     compile 'javax.servlet:servlet-api:2.5'
     compile 'com.googlecode.objectify:objectify:5.1.13'
@@ -37,7 +38,6 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile "com.google.appengine:appengine-api-stubs:$APP_ENGINE_VERSION"
-    testCompile "com.google.appengine:appengine-api-labs:$APP_ENGINE_VERSION"
     testCompile "com.google.appengine:appengine-testing:$APP_ENGINE_VERSION"
     testCompile 'org.mockito:mockito-all:2.0.2-beta'
 }

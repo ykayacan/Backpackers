@@ -1,25 +1,22 @@
 package com.yoloo.android.backend.model.user;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.condition.IfNotDefault;
 
 @Entity
 @Cache(expirationSeconds = 60)
-public class UserIndexShard {
+public class UserCounterShard {
 
     @Id
     private long shardId;
 
     @Parent
-    @Load
-    private Ref<Account> user;
+    private Key<Account> user;
 
     /**
      * The parentUserKey follower count.
@@ -39,16 +36,16 @@ public class UserIndexShard {
     @Index(IfNotDefault.class)
     private long questionCount = 0;
 
-    private UserIndexShard() {
+    private UserCounterShard() {
     }
 
-    private UserIndexShard(Builder builder) {
+    private UserCounterShard(Builder builder) {
         this.shardId = builder.shardId;
-        this.user = builder.user;
+        this.user = builder.userKey;
     }
 
-    public static UserIndexShard.Builder builder(long shardId, Key<Account> parentUserKey) {
-        return new UserIndexShard.Builder(shardId, parentUserKey);
+    public static UserCounterShard.Builder builder(long shardId, Key<Account> parentUserKey) {
+        return new UserCounterShard.Builder(shardId, parentUserKey);
     }
 
     public long getFolloweeCount() {
@@ -77,15 +74,15 @@ public class UserIndexShard {
 
     public static final class Builder {
         private long shardId;
-        private Ref<Account> user;
+        private Key<Account> userKey;
 
         public Builder(long shardId, Key<Account> parentUserKey) {
             this.shardId = shardId;
-            this.user = Ref.create(parentUserKey);
+            this.userKey = parentUserKey;
         }
 
-        public UserIndexShard build() {
-            return new UserIndexShard(this);
+        public UserCounterShard build() {
+            return new UserCounterShard(this);
         }
     }
 }

@@ -58,7 +58,7 @@ public class CreateTimelineServlet extends HttpServlet {
         // Get current user's follower keys.
         final List<Key<Account>> followerKeys = getFollowerKeys(userKey);
 
-        final List<TimelineFeed<TimelinePost>> feeds =
+        final List<TimelineFeed> feeds =
                 new ArrayList<>(followerKeys.size());
 
         final Date date = new Date(Long.parseLong(createdAt));

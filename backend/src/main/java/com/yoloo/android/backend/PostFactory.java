@@ -15,11 +15,11 @@ import java.util.List;
 
 public class PostFactory {
 
-    public TimelinePost createTimelinePost(String content,
+    public TimelinePost createTimelinePost(Key<TimelinePost> postKey,
                                            Account account,
-                                           Key<TimelinePost> postKey,
+                                           String content,
                                            String hashtags,
-                                           String locations) {
+                                           String location) {
         // TODO: 10.08.2016 Add mediaId case.
 
         // Generate hashtags from given string with immutable way.
@@ -27,8 +27,7 @@ public class PostFactory {
                 ImmutableList.copyOf(StringUtil.splitValueByToken(hashtags, ","));
 
         // Generate locations from given string with immutable way.
-        List<Location> locationList =
-                ImmutableList.copyOf(LocationHelper.getLocations(locations, postKey));
+        List<Location> locationList = LocationHelper.getLocationList(location, postKey);
 
         return TimelinePost.builder()
                 .setHashtags(hastagList)
@@ -52,7 +51,6 @@ public class PostFactory {
                                      String hashtags,
                                      String locations,
                                      Boolean isLocked,
-                                     Key<Account> awardedByKey,
                                      Integer awardRep) {
         // TODO: 10.08.2016 Add mediaId case.
 
@@ -61,16 +59,14 @@ public class PostFactory {
                 ImmutableList.copyOf(StringUtil.splitValueByToken(hashtags, ","));
 
         // Generate locations from given string with immutable way.
-        List<Location> locationList =
-                ImmutableList.copyOf(LocationHelper.getLocations(locations, postKey));
+        List<Location> locationList = LocationHelper.getLocationList(locations, postKey);
 
         return ForumPost.builder()
                 .setHashtags(hastagList)
                 .setLocations(locationList)
                 .setLocked(isLocked)
                 /*.setVideoUrl()*/
-                .setAwardedBy(awardedByKey)
-                .setAwardRep(awardRep)
+                .setAward(account.getKey(), awardRep)
                 .setKey(postKey)
                 .setParentUserKey(account.getKey())
                 .setUsername(account.getUsername())

@@ -19,9 +19,8 @@ import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
 import com.yoloo.android.backend.authenticator.YolooAuthenticator;
 import com.yoloo.android.backend.controller.CommentController;
 import com.yoloo.android.backend.model.comment.Comment;
-import com.yoloo.android.backend.model.like.Like;
+import com.yoloo.android.backend.model.feed.post.TimelinePost;
 import com.yoloo.android.backend.model.question.Question;
-import com.yoloo.android.backend.util.ClassUtil;
 import com.yoloo.android.backend.validator.Validator;
 import com.yoloo.android.backend.validator.rule.comment.CommentCreateRule;
 import com.yoloo.android.backend.validator.rule.common.AllowedToOperate;
@@ -62,7 +61,8 @@ import static com.yoloo.android.backend.service.OfyHelper.ofy;
 )
 public class CommentEndpoint {
 
-    private static final Logger logger = Logger.getLogger(CommentEndpoint.class.getSimpleName());
+    private static final Logger logger =
+            Logger.getLogger(CommentEndpoint.class.getName());
 
     private static final int DEFAULT_LIST_LIMIT = 20;
 
@@ -70,49 +70,96 @@ public class CommentEndpoint {
      * Inserts a new {@code Comment}.
      */
     @ApiMethod(
-            name = "questions.comments.add",
-            path = "questions/{question_id}/comments",
+            name = "posts.comments.add",
+            path = "posts/{postId}/comments",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public Comment add(@Named("question_id") final String questionId,
-                       @Named("text") final String text,
-                       final User user) throws ServiceException {
+    public Comment addPostComment(@Named("postId") final String websafePostId,
+                                  @Named("text") final String text,
+                                  final User user) throws ServiceException {
 
         Validator.builder()
-                .addRule(new IdValidationRule(questionId))
+                .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
                 .addRule(new CommentCreateRule(text))
-                .addRule(new NotFoundRule(Question.class, questionId))
+                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
                 .validate();
 
-        return CommentController.newInstance().add(questionId, text, user);
+        return CommentController.newInstance().add(websafePostId, text, user);
+    }
+
+    /**
+     * Inserts a new {@code Comment}.
+     */
+    @ApiMethod(
+            name = "questions.comments.add",
+            path = "questions/{questionId}/comments",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public Comment addQuestionComment(@Named("questionId") final String websafePostId,
+                                      @Named("text") final String text,
+                                      final User user) throws ServiceException {
+
+        Validator.builder()
+                .addRule(new IdValidationRule(websafePostId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new CommentCreateRule(text))
+                .addRule(new NotFoundRule(Question.class, websafePostId))
+                .validate();
+
+        return CommentController.newInstance().add(websafePostId, text, user);
     }
 
     /**
      * Deletes the specified {@code Comment}.
      *
-     * @param questionId the ID of the entity to delete
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     *                           {@code Comment}
+     */
+    @ApiMethod(
+            name = "posts.comments.remove",
+            path = "posts/{postId}/comments/{commentId}",
+            httpMethod = ApiMethod.HttpMethod.DELETE)
+    public void removePostComment(@Named("postId") final String websafePostId,
+                                  @Named("commentId") final String websafeCommentId,
+                                  final User user) throws ServiceException {
+
+        // Validate.
+        Validator.builder()
+                .addRule(new IdValidationRule(websafePostId))
+                .addRule(new IdValidationRule(websafeCommentId))
+                .addRule(new AuthenticationRule(user))
+                .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
+                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
+                .addRule(new AllowedToOperate(Comment.class, websafeCommentId, user, "delete"))
+                .validate();
+
+        CommentController.newInstance().remove(websafePostId, websafeCommentId, user);
+    }
+
+    /**
+     * Deletes the specified {@code Comment}.
+     *
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Comment}
      */
     @ApiMethod(
             name = "questions.comments.remove",
-            path = "questions/{question_id}/comments/{id}",
+            path = "questions/{questionId}/comments/{commentId}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("question_id") final String questionId,
-                       @Named("id") final String commentId,
-                       final User user) throws ServiceException {
+    public void removeQuestionComment(@Named("questionId") final String websafePostId,
+                                      @Named("commentId") final String websafeCommentId,
+                                      final User user) throws ServiceException {
 
         // Validate.
         Validator.builder()
-                .addRule(new IdValidationRule(questionId))
-                .addRule(new IdValidationRule(commentId))
+                .addRule(new IdValidationRule(websafePostId))
+                .addRule(new IdValidationRule(websafeCommentId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Question.class, questionId))
-                .addRule(new NotFoundRule(Comment.class, commentId))
-                .addRule(new AllowedToOperate(Comment.class, commentId, user, "delete"))
+                .addRule(new NotFoundRule(Question.class, websafePostId))
+                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
+                .addRule(new AllowedToOperate(Comment.class, websafeCommentId, user, "delete"))
                 .validate();
 
-        CommentController.newInstance().remove(questionId, commentId, user);
+        CommentController.newInstance().remove(websafePostId, websafeCommentId, user);
     }
 
     /**
@@ -145,10 +192,10 @@ public class CommentEndpoint {
         query = query.limit(limit);
 
         // load comment like keys of the current parentUserKey.
-        List<Like<Comment>> likes = ofy().load()
+        /*List<Like<Comment>> likes = ofy().load()
                 .type(ClassUtil.<Like<Comment>>castClass(Like.class))
                 .ancestor(Key.create(user.getUserId()))
-                .list();
+                .list();*/
 
         QueryResultIterator<Comment> queryIterator = query.iterator();
         List<Comment> commentList = new ArrayList<>(limit);
@@ -157,13 +204,13 @@ public class CommentEndpoint {
         }
 
         // Set likes
-        for (Like<Comment> like : likes) {
+        /*for (Like<Comment> like : likes) {
             for (Comment comment : commentList) {
                 if (like.getLikeableEntityKey().equivalent(comment.getKey())) {
                     comment.setLiked(true);
                 }
             }
-        }
+        }*/
 
         return CollectionResponse.<Comment>builder()
                 .setItems(commentList)

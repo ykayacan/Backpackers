@@ -24,7 +24,7 @@ public final class OAuth {
     public static final String OAUTH_VERSION_DIFFER = "oauth_signature_method";
     public static final String ASSERTION = "assertion";
 
-    public OAuth() {
+    private OAuth() {
     }
 
     public static final class ContentType {
@@ -42,16 +42,6 @@ public final class OAuth {
         public static final String PROVIDER = "X-Provider";
 
         public HeaderType() {
-        }
-    }
-
-    public static final class HttpMethod {
-        public static final String POST = "POST";
-        public static final String GET = "GET";
-        public static final String DELETE = "DELETE";
-        public static final String PUT = "PUT";
-
-        public HttpMethod() {
         }
     }
 }

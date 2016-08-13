@@ -56,7 +56,6 @@ public class PostEndpointTest extends TestBase {
     @Test
     public void list() throws Exception {
 
-        postEndpoint.list(null, null, null, null);
     }
 
     private String initCredentials() {

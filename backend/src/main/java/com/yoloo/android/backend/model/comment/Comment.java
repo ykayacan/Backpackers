@@ -2,6 +2,7 @@ package com.yoloo.android.backend.model.comment;
 
 import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.ApiResourceProperty;
+import com.google.appengine.api.datastore.Link;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonPropertyOrder;
 
@@ -15,15 +16,14 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Parent;
 import com.yoloo.android.backend.model.like.Likeable;
-import com.yoloo.android.backend.model.question.Question;
 import com.yoloo.android.backend.model.user.Account;
 
 import java.util.Date;
 
 @Entity
 @Cache
-@JsonPropertyOrder({"id", "username", "profileImageUrl", "comment",
-        "liked", "likesCount", "createdAt"})
+@JsonPropertyOrder({"id", "ownerId", "username", "profileImageUrl", "comment",
+        "liked", "likeCount", "createdAt"})
 public class Comment implements Likeable {
 
     @Id
@@ -33,21 +33,16 @@ public class Comment implements Likeable {
     @Parent
     @Load
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    private Ref<Question> question;
+    private Ref<Account> parentUser;
 
     @Index
-    @Load
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    private Ref<Account> user;
+    private Key<? extends Commentable> commentableKey;
 
     private String comment;
 
     private String username;
 
-    private String profileImageUrl;
-
-    @Index
-    private long likesCount = 0;
+    private Link profileImageUrl;
 
     @Index
     private Date createdAt;
@@ -57,31 +52,44 @@ public class Comment implements Likeable {
     @Ignore
     private boolean isLiked = false;
 
+    @Ignore
+    private long likeCount = 0L;
+
     private Comment() {
     }
 
     private Comment(Builder builder) {
-        this.question = builder.question;
-        this.user = builder.user;
+        this.parentUser = builder.parentUser;
+        this.commentableKey = builder.commentableKey;
         this.profileImageUrl = builder.profileImageUrl;
         this.username = builder.username;
         this.comment = builder.comment;
         this.createdAt = new Date();
     }
 
-    public static Comment.Builder builder(Key<Question> parentQuestionKey,
-                                          Key<Account> userKey) {
-        return new Comment.Builder(parentQuestionKey, userKey);
+    public static Comment.Builder builder(Key<? extends Commentable> commentableKey,
+                                          Key<Account> parentUserKey) {
+        return new Comment.Builder(commentableKey, parentUserKey);
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public Key<Comment> getKey() {
-        return Key.create(question.getKey(), Comment.class, id);
+        return Key.create(parentUser.getKey(), Comment.class, id);
     }
 
+    /**
+     * Gets websafe key.
+     *
+     * @return the websafe key
+     */
     @JsonProperty("id")
     public String getWebsafeKey() {
         return getKey().toWebSafeString();
+    }
+
+    @JsonProperty("ownerId")
+    public String getParentUserKey() {
+        return parentUser.getKey().toWebSafeString();
     }
 
     public String getComment() {
@@ -92,16 +100,16 @@ public class Comment implements Likeable {
         return createdAt;
     }
 
-    public long getLikesCount() {
-        return likesCount;
+    public long getLikeCount() {
+        return likeCount;
     }
 
-    public void setLikesCount(long likesCount) {
-        this.likesCount = likesCount;
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
     }
 
     public String getProfileImageUrl() {
-        return profileImageUrl;
+        return profileImageUrl.getValue();
     }
 
     public String getUsername() {
@@ -117,20 +125,20 @@ public class Comment implements Likeable {
     }
 
     public static final class Builder {
-        private Ref<Question> question;
-        private Ref<Account> user;
-        private String profileImageUrl;
+        private Ref<Account> parentUser;
+        private Key<? extends Commentable> commentableKey;
+        private Link profileImageUrl;
         private String username;
         private String comment;
 
-        public Builder(Key<Question> parentQuestionKey,
+        public Builder(Key<? extends Commentable> commentableKey,
                        Key<Account> userKey) {
-            this.question = Ref.create(parentQuestionKey);
-            this.user = Ref.create(userKey);
+            this.commentableKey = commentableKey;
+            this.parentUser = Ref.create(userKey);
         }
 
         public Builder setProfileImageUrl(String profileImageUrl) {
-            this.profileImageUrl = profileImageUrl;
+            this.profileImageUrl = new Link(profileImageUrl);
             return this;
         }
 

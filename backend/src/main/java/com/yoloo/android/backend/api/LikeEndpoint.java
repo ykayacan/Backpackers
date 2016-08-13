@@ -12,18 +12,14 @@ import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
 import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
 import com.yoloo.android.backend.authenticator.YolooAuthenticator;
 import com.yoloo.android.backend.controller.LikeController;
-import com.yoloo.android.backend.controller.LikeManager;
 import com.yoloo.android.backend.model.comment.Comment;
 import com.yoloo.android.backend.model.feed.post.TimelinePost;
-import com.yoloo.android.backend.model.question.Question;
 import com.yoloo.android.backend.validator.Validator;
 import com.yoloo.android.backend.validator.rule.common.AuthenticationRule;
 import com.yoloo.android.backend.validator.rule.common.IdValidationRule;
 import com.yoloo.android.backend.validator.rule.common.NotFoundRule;
 import com.yoloo.android.backend.validator.rule.like.LikeConflictRule;
 import com.yoloo.android.backend.validator.rule.like.LikeNotFoundRule;
-import com.yoloo.android.backend.validator.rule.like.PostLikeConflictRule;
-import com.yoloo.android.backend.validator.rule.like.PostLikeNotFoundRule;
 
 import java.util.logging.Logger;
 
@@ -52,27 +48,28 @@ import javax.inject.Named;
 )
 public class LikeEndpoint {
 
-    private static final Logger logger = Logger.getLogger(LikeEndpoint.class.getSimpleName());
+    private static final Logger logger =
+            Logger.getLogger(LikeEndpoint.class.getName());
 
     /**
      * Adds a new {@code Like}.
      *
      * @param websafePostId the id of the Feed
-     * @param user       the parentUserKey
+     * @param user          the parentUserKey
      * @throws ServiceException the service exception
      */
     @ApiMethod(
             name = "posts.like",
-            path = "posts/{post_id}/likes",
+            path = "posts/{postId}/likes",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public void likePost(@Named("post_id") final String websafePostId, final User user)
+    public void likePost(@Named("postId") final String websafePostId, final User user)
             throws ServiceException {
 
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
                 .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
-                .addRule(new PostLikeConflictRule(websafePostId, user))
+                .addRule(new LikeConflictRule(websafePostId, user))
                 .validate();
 
         LikeController.newInstance(user, websafePostId).like();
@@ -82,21 +79,21 @@ public class LikeEndpoint {
      * Deletes like from Feed.
      *
      * @param websafePostId the id of the Post
-     * @param user       the parentUserKey
+     * @param user          the parentUserKey
      * @throws ServiceException the service exception
      */
     @ApiMethod(
             name = "posts.dislike",
-            path = "posts/{post_id}/likes",
+            path = "posts/{postId}/likes",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void dislikePost(@Named("post_id") final String websafePostId, final User user)
+    public void dislikePost(@Named("postId") final String websafePostId, final User user)
             throws ServiceException {
 
         Validator.builder()
                 .addRule(new IdValidationRule(websafePostId))
                 .addRule(new AuthenticationRule(user))
                 .addRule(new NotFoundRule(TimelinePost.class, websafePostId))
-                .addRule(new PostLikeNotFoundRule(websafePostId, user))
+                .addRule(new LikeNotFoundRule(websafePostId, user))
                 .validate();
 
         LikeController.newInstance(user, websafePostId).dislike();
@@ -106,14 +103,14 @@ public class LikeEndpoint {
      * Adds a new {@code Like}.
      *
      * @param websafeCommentId the id of the Question
-     * @param user      the parentUserKey
+     * @param user             the parentUserKey
      * @throws ServiceException the service exception
      */
     @ApiMethod(
             name = "comments.like",
-            path = "comments/{comment_id}/likes",
+            path = "comments/{commentId}/likes",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public void likeComment(@Named("comment_id") final String websafeCommentId, final User user)
+    public void likeComment(@Named("commentId") final String websafeCommentId, final User user)
             throws ServiceException {
 
         Validator.builder()
@@ -123,78 +120,30 @@ public class LikeEndpoint {
                 .addRule(new LikeConflictRule(websafeCommentId, user))
                 .validate();
 
-        LikeManager.newInstance(Comment.class, websafeCommentId, user).like();
+        LikeController.newInstance(user, websafeCommentId).like();
     }
 
     /**
      * Deletes like from Feed.
      *
-     * @param commentId the id of the Feed
-     * @param user      the parentUserKey
+     * @param websafeCommentId the id of the Feed
+     * @param user             the parentUserKey
      * @throws ServiceException the service exception
      */
     @ApiMethod(
-            name = "comments.unlike",
-            path = "comments/{comment_id}/likes",
+            name = "comments.dislike",
+            path = "comments/{commentId}/likes",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void unlikeComment(@Named("comment_id") final String commentId, final User user)
+    public void dislikeComment(@Named("commentId") final String websafeCommentId, final User user)
             throws ServiceException {
 
         Validator.builder()
-                .addRule(new IdValidationRule(commentId))
+                .addRule(new IdValidationRule(websafeCommentId))
                 .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Comment.class, commentId))
-                .addRule(new LikeNotFoundRule(commentId, user))
+                .addRule(new NotFoundRule(Comment.class, websafeCommentId))
+                .addRule(new LikeNotFoundRule(websafeCommentId, user))
                 .validate();
 
-        LikeManager.newInstance(Comment.class, commentId, user).unlike();
-    }
-
-    /**
-     * Adds a new {@code Like}.
-     *
-     * @param questionId the id of the Feed
-     * @param user       the parentUserKey
-     * @throws ServiceException the service exception
-     */
-    @ApiMethod(
-            name = "questions.like",
-            path = "questions/{question_id}/likes",
-            httpMethod = ApiMethod.HttpMethod.POST)
-    public void likeQuestion(@Named("question_id") final String questionId, final User user)
-            throws ServiceException {
-
-        Validator.builder()
-                .addRule(new IdValidationRule(questionId))
-                .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Question.class, questionId))
-                .addRule(new LikeConflictRule(questionId, user))
-                .validate();
-
-        LikeManager.newInstance(Question.class, questionId, user).like();
-    }
-
-    /**
-     * Deletes like from Feed.
-     *
-     * @param questionId the id of the Question
-     * @param user       the parentUserKey
-     * @throws ServiceException the service exception
-     */
-    @ApiMethod(
-            name = "questions.dislike",
-            path = "questions/{question_id}/likes",
-            httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void dislikeQuestion(@Named("question_id") final String questionId, final User user)
-            throws ServiceException {
-
-        Validator.builder()
-                .addRule(new IdValidationRule(questionId))
-                .addRule(new AuthenticationRule(user))
-                .addRule(new NotFoundRule(Question.class, questionId))
-                .addRule(new LikeNotFoundRule(questionId, user))
-                .validate();
-
-        LikeManager.newInstance(Question.class, questionId, user).unlike();
+        LikeController.newInstance(user, websafeCommentId).dislike();
     }
 }

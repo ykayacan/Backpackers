@@ -5,9 +5,6 @@ import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.users.User;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -17,17 +14,19 @@ import com.googlecode.objectify.LoadResult;
 import com.googlecode.objectify.cmd.Query;
 import com.yoloo.android.backend.PostFactory;
 import com.yoloo.android.backend.model.feed.TimelineFeed;
+import com.yoloo.android.backend.model.feed.post.Post;
 import com.yoloo.android.backend.model.feed.post.TimelinePost;
 import com.yoloo.android.backend.model.follow.Follow;
-import com.yoloo.android.backend.model.like.LikeEntity;
+import com.yoloo.android.backend.model.like.Like;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
 import com.yoloo.android.backend.servlet.CreateTimelineServlet;
-import com.yoloo.android.backend.util.ClassUtil;
+import com.yoloo.android.backend.servlet.RemoveTimelineServlet;
 import com.yoloo.android.backend.util.LikeHelper;
 import com.yoloo.android.backend.util.LocationHelper;
 import com.yoloo.android.backend.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -62,20 +61,20 @@ public class TimelineController {
     /**
      * Add timeline post.
      *
-     * @param content   the content
-     * @param hashtags  the hashtags
+     * @param content  the content
+     * @param hashtags the hashtags
      * @param location the location
-     * @param mediaIds  the media ids
-     * @param request   the request
-     * @param user      the user
+     * @param mediaIds the media ids
+     * @param request  the request
+     * @param user     the user
      * @return the timeline post
      */
-    public TimelinePost add(final String content,
-                            final String hashtags,
-                            final String location,
-                            final String mediaIds,
-                            final HttpServletRequest request,
-                            final User user) {
+    public Post add(final String content,
+                    final String hashtags,
+                    final String location,
+                    final String mediaIds,
+                    final HttpServletRequest request,
+                    final User user) {
         // Create parent user key.
         final Key<Account> userKey = Key.create(user.getUserId());
 
@@ -90,10 +89,10 @@ public class TimelineController {
 
         // Create a new post.
         final TimelinePost post = new PostFactory()
-                .createTimelinePost(content, account, postKey, hashtags, location);
+                .createTimelinePost(postKey, account, content, hashtags, location);
 
         // Add current post to user's feed.
-        final TimelineFeed<TimelinePost> feed =
+        final TimelineFeed feed =
                 TimelineFeed.newInstance(userKey, postKey, post.getCreatedAt());
 
         writeToFollowersTimeline(userKey, postKey, post);
@@ -117,60 +116,47 @@ public class TimelineController {
      * @param websafePostId the websafe post id
      * @param content       the content
      * @param hashtags      the hashtags
-     * @param location     the location
+     * @param location      the location
      * @param mediaIds      the media ids
      * @param request       the request
      * @param user          the user
      * @return the timeline post
      */
-    public TimelinePost update(final String websafePostId,
-                               final String content,
-                               final String hashtags,
-                               final String location,
-                               final String mediaIds,
-                               final HttpServletRequest request,
-                               final User user) {
-        Key<TimelinePost> postKey = Key.create(websafePostId);
+    public Post update(final String websafePostId,
+                       final String content,
+                       final String hashtags,
+                       final String location,
+                       final String mediaIds,
+                       final HttpServletRequest request,
+                       final User user) {
+        final Key<TimelinePost> postKey = Key.create(websafePostId);
+        final Key<Account> userKey = Key.create(user.getUserId());
 
         TimelinePost post = ofy().load().key(postKey).now();
 
+        final LoadResult<Key<Like>> result = LikeHelper.loadAsyncLikes(userKey, postKey);
+
+        List<Object> saveList = new ArrayList<>(2);
+
         // Check if any part of the entity is changed.
-        boolean isUpdated = false;
+        boolean isUpdated;
 
         // TODO: 10.08.2016 Add mediaId case.
 
-        if (!Strings.isNullOrEmpty(content)) {
-            post.setContent(content);
-            isUpdated = true;
-        }
-        if (!Strings.isNullOrEmpty(hashtags)) {
-            post.getHashtags().clear();
-            post.getHashtags().addAll(StringUtil.splitValueByToken(hashtags, ","));
-            isUpdated = true;
-        }
-        if (!Strings.isNullOrEmpty(location)) {
-            // Find related Location entities with the given post key.
-            Key<Location> locationKey = ofy().load().type(Location.class)
-                    .filter("postKey =", postKey).keys().first().now();
-
-            // Delete entity.
-            ofy().delete().key(locationKey);
-
-            // Generate locations from given string with immutable way.
-            Set<Location> locationSet =
-                    ImmutableSet.copyOf(LocationHelper.getLocations(location, postKey));
-            post.setLocations(locationSet);
-
-            ofy().save().entities(locationSet);
-
-            isUpdated = true;
-        }
+        isUpdated = updateContent(content, post, false);
+        isUpdated = updateHashtags(hashtags, post, isUpdated);
+        isUpdated = updateLocations(location, postKey, post, saveList, isUpdated);
+        updateDate(post, isUpdated);
 
         if (isUpdated) {
             post.setUpdatedAt(new Date());
         }
 
-        ofy().save().entities(post);
+        saveList.add(post);
+
+        ofy().save().entities(saveList);
+
+        LikeHelper.aggregateLikes(post, result);
 
         return post;
     }
@@ -184,69 +170,104 @@ public class TimelineController {
     public void remove(final String websafePostId,
                        final User user) {
         // Get Post key.
-        Key<TimelinePost> postKey = Key.create(websafePostId);
-
-        Queue queue = QueueFactory.getQueue("remove-timeline-queue");
-        queue.add(TaskOptions.Builder
-                .withUrl("/tasks/removeTimeline")
-                .param("websafePostId", postKey.toWebSafeString()));
-
+        RemoveTimelineServlet.create(websafePostId);
     }
 
     /**
      * List collection response.
      *
-     * @param websafeUserKey the websafe user key
-     * @param cursor         the cursor
-     * @param limit          the limit
-     * @param user           the user
+     * @param websafeUserId the websafe user key
+     * @param cursor        the cursor
+     * @param limit         the limit
+     * @param user          the user
      * @return the collection response
      * @throws ServiceException the service exception
      */
-    public CollectionResponse<TimelinePost> list(final String websafeUserKey,
-                                                 final String cursor,
-                                                 Integer limit,
-                                                 final User user) {
+    public CollectionResponse<Post> list(final String websafeUserId,
+                                         final String cursor,
+                                         Integer limit,
+                                         final User user) {
 
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
 
         final Key<Account> userKey = Key.create(user.getUserId());
 
-        final Key<Account> parentUserKey = websafeUserKey == null
+        final Key<Account> parentUserKey = websafeUserId == null
                 ? userKey
-                : Key.<Account>create(websafeUserKey);
+                : Key.<Account>create(websafeUserId);
 
-        Query<TimelineFeed<TimelinePost>> query = ofy().load()
-                .type(ClassUtil.<TimelineFeed<TimelinePost>>castClass(TimelineFeed.class))
+        Query<TimelineFeed> query = ofy().load().type(TimelineFeed.class)
                 .ancestor(parentUserKey);
 
         query = buildQuery(cursor, limit, query);
 
-        final QueryResultIterator<TimelineFeed<TimelinePost>> queryIterator = query.iterator();
+        final QueryResultIterator<TimelineFeed> queryIterator = query.iterator();
 
         // Store async batch in a hashmap. LinkedHashMap preserve insertion order.
-        final Map<Key<TimelinePost>,
-                LoadResult<Key<LikeEntity<TimelinePost>>>> map = new LinkedHashMap<>(limit);
+        final Map<Key<Post>, LoadResult<Key<Like>>> map = new LinkedHashMap<>(limit);
 
         while (queryIterator.hasNext()) {
             // Get post key.
-            final Key<TimelinePost> postKey = queryIterator.next().getPostKey();
-            final LoadResult<Key<LikeEntity<TimelinePost>>> keyLoadResult =
-                    getKeyLoadResult(userKey, postKey);
+            final Key<Post> postKey = queryIterator.next().getPostKey();
+            final LoadResult<Key<Like>> result = LikeHelper.loadAsyncLikes(userKey, postKey);
 
-            map.put(postKey, keyLoadResult);
+            map.put(postKey, result);
         }
 
         // Batch load all post keys for timeline.
-        final Collection<TimelinePost> posts = ofy().load().keys(map.keySet()).values();
+        final Collection<Post> posts = ofy().load().keys(map.keySet()).values();
 
-        LikeHelper.setUserLikes(posts, map);
-        LikeHelper.setLikeCountByPost(posts);
+        LikeHelper.aggregateLikes(posts, map);
 
-        return CollectionResponse.<TimelinePost>builder()
+        return CollectionResponse.<Post>builder()
                 .setItems(posts)
                 .setNextPageToken(queryIterator.getCursor().toWebSafeString())
                 .build();
+    }
+
+    private void updateDate(TimelinePost post, boolean isUpdated) {
+        if (isUpdated) {
+            post.setUpdatedAt(new Date());
+        }
+    }
+
+    private boolean updateLocations(String locations, Key<TimelinePost> postKey, TimelinePost post,
+                                    List<Object> saveList, boolean isUpdated) {
+        if (!Strings.isNullOrEmpty(locations)) {
+            // Find related Location entities with the given post key.
+            List<Key<Location>> locationKeys = ofy().load().type(Location.class)
+                    .filter("postKey =", postKey).keys().list();
+
+            // Delete all entities.
+            ofy().delete().keys(locationKeys);
+
+            // Generate locations from given string with immutable way.
+            Set<Location> locationSet =
+                    ImmutableSet.copyOf(LocationHelper.getLocationList(locations, postKey));
+            post.setLocations(locationSet);
+
+            saveList.addAll(locationSet);
+
+            isUpdated = true;
+        }
+        return isUpdated;
+    }
+
+    private boolean updateHashtags(String hashtags, TimelinePost post, boolean isUpdated) {
+        if (!Strings.isNullOrEmpty(hashtags)) {
+            post.getHashtags().clear();
+            post.getHashtags().addAll(StringUtil.splitValueByToken(hashtags, ","));
+            isUpdated = true;
+        }
+        return isUpdated;
+    }
+
+    private boolean updateContent(String content, TimelinePost post, boolean isUpdated) {
+        if (!Strings.isNullOrEmpty(content)) {
+            post.setContent(content);
+            isUpdated = true;
+        }
+        return isUpdated;
     }
 
     private void writeToFollowersTimeline(Key<Account> userKey,
@@ -265,19 +286,8 @@ public class TimelineController {
         }
     }
 
-    private LoadResult<Key<LikeEntity<TimelinePost>>> getKeyLoadResult(Key<Account> userKey,
-                                                                       Key<TimelinePost> postKey) {
-        // Async load
-        return ofy().load()
-                .type(ClassUtil.<LikeEntity<TimelinePost>>castClass(LikeEntity.class))
-                .ancestor(userKey)
-                .filter("postKey =", postKey)
-                .keys().first();
-    }
-
-    private Query<TimelineFeed<TimelinePost>> buildQuery(String cursor,
-                                                         Integer limit,
-                                                         Query<TimelineFeed<TimelinePost>> query) {
+    private Query<TimelineFeed> buildQuery(String cursor, Integer limit,
+                                           Query<TimelineFeed> query) {
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }

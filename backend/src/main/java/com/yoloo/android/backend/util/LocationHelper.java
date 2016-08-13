@@ -13,6 +13,8 @@ import com.google.appengine.api.search.ScoredDocument;
 import com.google.appengine.api.search.SearchServiceFactory;
 import com.google.appengine.api.search.SortExpression;
 import com.google.appengine.api.search.SortOptions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import com.googlecode.objectify.Key;
 import com.yoloo.android.backend.model.feed.post.Post;
@@ -21,6 +23,7 @@ import com.yoloo.android.backend.model.location.LocationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static com.google.appengine.api.utils.SystemProperty.Environment.Value.Development;
@@ -238,15 +241,25 @@ public final class LocationHelper {
         return new GeoPt(Float.valueOf(coords.get(0)), Float.valueOf(coords.get(1)));
     }
 
-    public static List<Location> getLocations(String locationArgs,
-                                               Key<? extends Post> feedKey) {
+    public static List<Location> getLocationList(String locationArgs,
+                                                 Key<? extends Post> postKey) {
+        return ImmutableList.copyOf(getLocations(locationArgs, postKey));
+    }
+
+    public static Set<Location> getLocationSet(String locationArgs,
+                                               Key<? extends Post> postKey) {
+        return ImmutableSet.copyOf(getLocations(locationArgs, postKey));
+    }
+
+    private static List<Location> getLocations(String locationArgs,
+                                        Key<? extends Post> postKey) {
         List<String> locationParts = StringUtil.splitValueByToken(locationArgs, ";");
         List<Location> locations = new ArrayList<>(3);
         for (String part : locationParts) {
             List<String> block = StringUtil.splitValueByToken(part, ":");
 
             Location location = Location.builder()
-                    .setPostKey(feedKey)
+                    .setPostKey(postKey)
                     .setName(block.get(0))
                     .setGeoPt(LocationHelper.createLocationFromString(block.get(1)))
                     .build();

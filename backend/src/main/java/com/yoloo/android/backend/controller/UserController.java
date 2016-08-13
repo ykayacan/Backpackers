@@ -7,11 +7,9 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
-import com.yoloo.android.backend.counter.user.UserFollowerCounter;
-import com.yoloo.android.backend.counter.user.UserFoloweeCounter;
 import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.user.Account;
-import com.yoloo.android.backend.model.user.UserIndexShard;
+import com.yoloo.android.backend.model.user.UserCounterShard;
 import com.yoloo.android.backend.model.user.UserIndexShardCounter;
 
 import java.util.Collections;
@@ -74,8 +72,8 @@ public class UserController {
 
         Account account = ofy().load().key(userKey).now();
 
-        List<UserIndexShard> shards =
-                ofy().load().type(UserIndexShard.class).ancestor(userKey).list();
+        List<UserCounterShard> shards =
+                ofy().load().type(UserCounterShard.class).ancestor(userKey).list();
 
         setExtraUserFields(account, shards);
 
@@ -95,10 +93,10 @@ public class UserController {
                         (String) payload.get("picture") : "https://s31.postimg.org/bgayiukkb/dummy_user_icon.jpg")
                 .build();
 
-        final UserIndexShard userIndexShard =
-                UserIndexShard.builder(1, userKey).build();
+        final UserCounterShard userCounterShard =
+                UserCounterShard.builder(1, userKey).build();
 
-        return save(account, userIndexShard);
+        return save(account, userCounterShard);
     }
 
     public Account add(final String[] values) {
@@ -113,15 +111,15 @@ public class UserController {
                 .setProfileImageUrl("https://s31.postimg.org/bgayiukkb/dummy_user_icon.jpg")
                 .build();
 
-        final UserIndexShard userIndexShard =
-                UserIndexShard.builder(1, userKey).build();
+        final UserCounterShard userCounterShard =
+                UserCounterShard.builder(1, userKey).build();
 
-        return save(account, userIndexShard);
+        return save(account, userCounterShard);
     }
 
-    public void follow(final String websafeFolloweeKey, final User user) {
+    public void follow(final String websafeFolloweeId, final User user) {
         final Key<Account> followerKey = Key.create(user.getUserId());
-        final Key<Account> followeeKey = Key.create(websafeFolloweeKey);
+        final Key<Account> followeeKey = Key.create(websafeFolloweeId);
 
         final Follow follow = Follow.newInstance(followerKey, followeeKey);
 
@@ -131,92 +129,92 @@ public class UserController {
         // Choose the shard randomly from the available shards.
         final int shardNum = generator.nextInt(numShards) + 1;
 
+        runFollowTransact(followerKey, followeeKey, follow, shardNum);
+    }
+
+    public void unfollow(final String websafeFolloweeId, final User user) {
+        Key<Account> followerKey = Key.create(user.getUserId());
+        Key<Account> followeeKey = Key.create(websafeFolloweeId);
+
+        final Key<Follow> followKey = ofy().load().type(Follow.class)
+                .ancestor(followerKey).filter("followeeKey =", followeeKey)
+                .keys().first().now();
+
+        final UserCounterShard followerShard = ofy().load().type(UserCounterShard.class)
+                .ancestor(followerKey).first().now();
+
+        followerShard.setFolloweeCount(followerShard.getFolloweeCount() - 1);
+
+        final UserCounterShard followeeShard = ofy().load().type(UserCounterShard.class)
+                .ancestor(followeeKey).first().now();
+
+        followeeShard.setFollowerCount(followeeShard.getFollowerCount() - 1);
+
+        runUnfollowTransact(followKey, followerShard, followeeShard);
+    }
+
+    private void runFollowTransact(final Key<Account> followerKey, final Key<Account> followeeKey,
+                                   final Follow follow, final int shardNum) {
         ofy().transact(new VoidWork() {
             @Override
             public void vrun() {
-                UserIndexShard followerShard;
-                UserIndexShard followeeShard;
+                UserCounterShard followerShard;
+                UserCounterShard followeeShard;
                 long followeeCount;
                 long followerCount;
 
                 try {
-                    followerShard = ofy().load().type(UserIndexShard.class)
+                    followerShard = ofy().load().type(UserCounterShard.class)
                             .parent(followerKey).id(shardNum).safe();
+                    followeeCount = followerShard.getFolloweeCount() + 1;
 
-                    new UserFoloweeCounter(followerShard).increase();
-
-                    //followeeCount = followerShard.getFolloweeCount() + 1;
-
-                    followeeShard = ofy().load().type(UserIndexShard.class)
+                    followeeShard = ofy().load().type(UserCounterShard.class)
                             .parent(followeeKey).id(shardNum).safe();
-
-                    new UserFollowerCounter(followeeShard).increase();
-
-                    //followerCount = followeeShard.getFollowerCount() + 1;
+                    followerCount = followeeShard.getFollowerCount() + 1;
                 } catch (NotFoundException e) {
-                    followerShard = UserIndexShard.builder(shardNum, followerKey).build();
+                    followerShard = UserCounterShard.builder(shardNum, followerKey).build();
+                    followeeCount = 1;
 
-                    new UserFoloweeCounter(followerShard).increase();
-                    //followeeCount = 1;
-
-                    followeeShard = UserIndexShard.builder(shardNum, followeeKey).build();
-
-                    new UserFollowerCounter(followeeShard).increase();
-                    //followerCount = 1;
+                    followeeShard = UserCounterShard.builder(shardNum, followeeKey).build();
+                    followerCount = 1;
                 }
-                //followerShard.setFolloweeCount(followeeCount);
-                //followeeShard.setFollowerCount(followerCount);
+                followerShard.setFolloweeCount(followeeCount);
+                followeeShard.setFollowerCount(followerCount);
 
                 ofy().save().entities(follow, followerShard, followeeShard);
             }
         });
     }
 
-    public void unfollow(final String websafeFolloweeKey, final User user) {
-        Key<Account> followerKey = Key.create(user.getUserId());
-        Key<Account> followeeKey = Key.create(websafeFolloweeKey);
-
-        final Key<Follow> followKey = ofy().load().type(Follow.class)
-                .ancestor(followerKey).filter("followeeKey =", followeeKey)
-                .keys().first().now();
-
-        final UserIndexShard followerShard =
-                ofy().load().type(UserIndexShard.class)
-                        .ancestor(followerKey).first().now();
-
-        new UserFoloweeCounter(followerShard).decrease();
-        //followerShard.setFolloweeCount(followerShard.getFolloweeCount() - 1);
-
-        final UserIndexShard followeeShard =
-                ofy().load().type(UserIndexShard.class)
-                        .ancestor(followeeKey).first().now();
-
-        new UserFollowerCounter(followeeShard).decrease();
-        //followeeShard.setFollowerCount(followeeShard.getFollowerCount() - 1);
-
-        ofy().delete().keys(followKey);
-        ofy().save().entities(followerShard, followeeShard).now();
+    private void runUnfollowTransact(final Key<Follow> followKey, final UserCounterShard followerShard, final UserCounterShard followeeShard) {
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                ofy().delete().keys(followKey);
+                ofy().save().entities(followerShard, followeeShard).now();
+            }
+        });
     }
 
     private Account save(final Account account,
-                         final UserIndexShard userIndexShard) {
+                         final UserCounterShard userCounterShard) {
         return ofy().transact(new Work<Account>() {
             @Override
             public Account run() {
-                ofy().save().entities(account, userIndexShard).now();
+                ofy().save().entities(account, userCounterShard).now();
 
-                setExtraUserFields(account, Collections.singletonList(userIndexShard));
+                setExtraUserFields(account, Collections.singletonList(userCounterShard));
                 return account;
             }
         });
     }
 
-    private void setExtraUserFields(Account account, List<UserIndexShard> shards) {
+    private void setExtraUserFields(Account account, List<UserCounterShard> shards) {
         long followeeSum = 0L;
         long followerSum = 0L;
         long questionSum = 0L;
 
-        for (UserIndexShard shard : shards) {
+        for (UserCounterShard shard : shards) {
             followeeSum += shard.getFolloweeCount();
             followerSum += shard.getFollowerCount();
             questionSum += shard.getQuestionCount();

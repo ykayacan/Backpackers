@@ -13,6 +13,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.condition.IfNotDefault;
+import com.yoloo.android.backend.model.comment.Commentable;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
 
@@ -26,7 +27,7 @@ import java.util.Set;
 @JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "content",
         "hashtags", "locations", "liked", "likeCount", "commentCount", "reportCount",
         "reportedBy", "createdAt", "updatedAt"})
-public class TimelinePost extends Post {
+public class TimelinePost extends Post implements Commentable {
 
     @Index
     private Set<String> hashtags;
@@ -74,11 +75,6 @@ public class TimelinePost extends Post {
                 return new TimelinePost(this);
             }
         };
-    }
-
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public Key<TimelinePost> getKey() {
-        return Key.create(parentUserKey, TimelinePost.class, id);
     }
 
     /**

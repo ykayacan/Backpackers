@@ -14,8 +14,8 @@ import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.condition.IfNotDefault;
 
 @Entity
-@Cache
-public class QuestionCounter {
+@Cache(expirationSeconds = 60)
+public class PostCounterShard {
 
     @Id
     private Long id;
@@ -30,23 +30,23 @@ public class QuestionCounter {
     @Index(IfNotDefault.class)
     private long commentsCount = 0;
 
-    private QuestionCounter() {
+    private PostCounterShard() {
     }
 
-    private QuestionCounter(Key<Question> parentQuestionKey) {
+    private PostCounterShard(Key<Question> parentQuestionKey) {
         this.question = Ref.create(parentQuestionKey);
     }
 
-    public static QuestionCounter newInstance(Key<Question> parentQuestionKey) {
-        return new QuestionCounter(parentQuestionKey);
+    public static PostCounterShard newInstance(Key<Question> parentQuestionKey) {
+        return new PostCounterShard(parentQuestionKey);
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public Key<QuestionCounter> getKey() {
-        return Key.create(question.getKey(), QuestionCounter.class, id);
+    public Key<PostCounterShard> getKey() {
+        return Key.create(question.getKey(), PostCounterShard.class, id);
     }
 
-    public long getLikesCount() {
+    public long getLikeCount() {
         return likesCount;
     }
 
@@ -54,7 +54,7 @@ public class QuestionCounter {
         this.likesCount = likesCount;
     }
 
-    public long getCommentsCount() {
+    public long getCommentCount() {
         return commentsCount;
     }
 

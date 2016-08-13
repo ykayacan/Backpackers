@@ -8,6 +8,7 @@ import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonPropert
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 import com.yoloo.android.backend.model.Photo;
 import com.yoloo.android.backend.model.like.Likeable;
@@ -58,6 +59,7 @@ public class Post implements Likeable {
     /**
      * The Created at.
      */
+    @Index
     protected Date createdAt;
 
     // Methods
@@ -82,6 +84,11 @@ public class Post implements Likeable {
                 return new Post(this);
             }
         };
+    }
+
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public Key<? extends Post> getKey() {
+        return Key.create(parentUserKey, this.getClass(), id);
     }
 
     @JsonProperty("ownerId")

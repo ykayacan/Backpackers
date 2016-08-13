@@ -14,6 +14,7 @@ import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
 import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
 import com.yoloo.android.backend.authenticator.YolooAuthenticator;
 import com.yoloo.android.backend.controller.TimelineController;
+import com.yoloo.android.backend.model.feed.post.Post;
 import com.yoloo.android.backend.model.feed.post.TimelinePost;
 import com.yoloo.android.backend.validator.Validator;
 import com.yoloo.android.backend.validator.rule.common.AllowedToOperate;
@@ -68,8 +69,8 @@ public class PostEndpoint {
             name = "posts.get",
             path = "posts/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public TimelinePost get(@Named("id") final String websafePostId,
-                            final User user)
+    public Post get(@Named("id") final String websafePostId,
+                    final User user)
             throws ServiceException {
 
         Validator.builder()
@@ -88,12 +89,12 @@ public class PostEndpoint {
             name = "posts.add",
             path = "posts",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public TimelinePost add(@Named("content") final String content,
-                            @Named("hashtags") final String hashtags,
-                            @Named("location") final String location,
-                            @Nullable @Named("mediaIds") final String mediaIds,
-                            final HttpServletRequest request,
-                            final User user)
+    public Post add(@Named("content") final String content,
+                    @Named("hashtags") final String hashtags,
+                    @Named("location") final String location,
+                    @Nullable @Named("mediaIds") final String mediaIds,
+                    final HttpServletRequest request,
+                    final User user)
             throws ServiceException {
 
         // TODO: 31.07.2016 Improve validation.
@@ -118,13 +119,13 @@ public class PostEndpoint {
             name = "posts.update",
             path = "posts/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public TimelinePost update(@Named("id") final String websafePostId,
-                               @Nullable @Named("content") final String content,
-                               @Nullable @Named("hashtags") final String hashtags,
-                               @Nullable @Named("location") final String location,
-                               @Nullable @Named("mediaIds") final String mediaIds,
-                               final HttpServletRequest request,
-                               final User user)
+    public Post update(@Named("id") final String websafePostId,
+                       @Nullable @Named("content") final String content,
+                       @Nullable @Named("hashtags") final String hashtags,
+                       @Nullable @Named("location") final String location,
+                       @Nullable @Named("mediaIds") final String mediaIds,
+                       final HttpServletRequest request,
+                       final User user)
             throws ServiceException {
 
         Validator.builder()
@@ -175,11 +176,11 @@ public class PostEndpoint {
             name = "posts.list",
             path = "posts",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<TimelinePost> list(@Nullable @Named("user_id") final String userId,
-                                                 @Nullable @Named("cursor") final String cursor,
-                                                 @Nullable @Named("limit") Integer limit,
-                                                 final HttpServletRequest request,
-                                                 final User user)
+    public CollectionResponse<Post> list(@Nullable @Named("userId") final String websafeUserId,
+                                         @Nullable @Named("cursor") final String cursor,
+                                         @Nullable @Named("limit") Integer limit,
+                                         final HttpServletRequest request,
+                                         final User user)
             throws ServiceException {
 
         // TODO: 31.07.2016 Improve validation.
@@ -188,6 +189,6 @@ public class PostEndpoint {
                 .validate();
 
         return TimelineController.newInstance()
-                .list(userId, cursor, limit, user);
+                .list(websafeUserId, cursor, limit, user);
     }
 }

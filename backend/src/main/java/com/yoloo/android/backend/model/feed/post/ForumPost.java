@@ -14,8 +14,10 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.condition.IfNotDefault;
+import com.yoloo.android.backend.model.comment.Commentable;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
+import com.yoloo.android.backend.model.vote.Vote;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,9 +29,9 @@ import java.util.Set;
 @Entity
 @Cache
 @JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "content", "hashtags",
-        "locations", "status", "ups", "downs", "viewCount", "commentCount", "reportCount",
-        "reportedBy", "awardedBy", "awardRep", "locked", "accepted" , "createdAt", "updatedAt"})
-public class ForumPost extends Post {
+        "locations", "status", "ups", "downs", "commentCount", "reportCount",
+        "reportedBy", "awardedBy", "awardRep", "locked", "accepted", "createdAt", "updatedAt"})
+public class ForumPost extends Post implements Commentable {
 
     private boolean isLocked = false;
 
@@ -56,7 +58,7 @@ public class ForumPost extends Post {
     // Extra fields
 
     @Ignore
-    private int status = VoteStatus.DEFAULT.getValue();
+    private Vote.Status status = Vote.Status.DEFAULT;
 
     @Ignore
     private long ups = 0L;
@@ -64,7 +66,9 @@ public class ForumPost extends Post {
     @Ignore
     private long downs = 0L;
 
+    // Ignore the parameter. Enable it in next feature release.
     @Ignore
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     private long viewCount = 0L;
 
     @Ignore
@@ -98,9 +102,14 @@ public class ForumPost extends Post {
         };
     }
 
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public Key<ForumPost> getKey() {
+        return Key.create(parentUserKey, ForumPost.class, id);
+    }
+
     @JsonProperty("id")
     public String getWebsafeKey() {
-        return Key.create(parentUserKey, ForumPost.class, id).toWebSafeString();
+        return getKey().toWebSafeString();
     }
 
     public boolean isLocked() {
@@ -124,6 +133,10 @@ public class ForumPost extends Post {
         return reportedByKeys;
     }
 
+    public void setReportedByKeys(Set<Key<Account>> reportedByKeys) {
+        this.reportedByKeys = reportedByKeys;
+    }
+
     @JsonProperty("reportedBy")
     public List<String> getReportedByIds() {
         if (reportedByKeys == null) {
@@ -135,10 +148,6 @@ public class ForumPost extends Post {
             reportIds.add(key.toWebSafeString());
         }
         return reportIds;
-    }
-
-    public void setReportedByKeys(Set<Key<Account>> reportedByKeys) {
-        this.reportedByKeys = reportedByKeys;
     }
 
     public String getVideoUrl() {
@@ -162,8 +171,8 @@ public class ForumPost extends Post {
         return awardedBy.getKey().toWebSafeString();
     }
 
-    public void setAwardedBy(Ref<Account> awardedBy) {
-        this.awardedBy = awardedBy;
+    public void setAwardedBy(Key<Account> awardedByKey) {
+        this.awardedBy = Ref.create(awardedByKey);
     }
 
     public int getAwardRep() {
@@ -190,12 +199,12 @@ public class ForumPost extends Post {
         this.updatedAt = updatedAt;
     }
 
-    public int getStatus() {
+    public Vote.Status getStatus() {
         return status;
     }
 
-    public void setStatus(VoteStatus status) {
-        this.status = status.getValue();
+    public void setStatus(Vote.Status status) {
+        this.status = status;
     }
 
     public long getUps() {
@@ -238,20 +247,6 @@ public class ForumPost extends Post {
         this.reportCount = reportCount;
     }
 
-    public enum VoteStatus {
-        DEFAULT(0), UP(1), DOWN(2);
-
-        private final int value;
-
-        VoteStatus(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
     public static abstract class Builder<T extends ForumPost> extends Post.Builder<T> {
         private boolean isLocked = false;
         private String videoUrl;
@@ -282,15 +277,11 @@ public class ForumPost extends Post {
             return this;
         }
 
-        public Builder<T> setAwardedBy(Key<Account> awardedByKey) {
-            if (awardedByKey != null) {
-                this.awardedBy = Ref.create(awardedByKey);
+        public Builder<T> setAward(Key<Account> awardedBy, Integer awardRep) {
+            if (awardRep != null) {
+                this.awardedBy = Ref.create(awardedBy);
+                this.awardRep = awardRep;
             }
-            return this;
-        }
-
-        public Builder<T> setAwardRep(Integer awardRep) {
-            this.awardRep = awardRep == null ? 0 : awardRep;
             return this;
         }
     }

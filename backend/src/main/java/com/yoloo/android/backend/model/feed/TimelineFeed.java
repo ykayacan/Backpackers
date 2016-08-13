@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Entity
 @Cache
-public class TimelineFeed<T extends Post> {
+public class TimelineFeed {
 
     @Id
     private Long id;
@@ -22,7 +22,7 @@ public class TimelineFeed<T extends Post> {
     private Key<Account> parentUserKey;
 
     @Index
-    private Key<T> postKey;
+    private Key<? extends Post> postKey;
 
     @Index
     private Date createdAt;
@@ -30,21 +30,23 @@ public class TimelineFeed<T extends Post> {
     private TimelineFeed() {
     }
 
-    private TimelineFeed(Key<Account> parentUserKey, Key<T> postKey, Date createdAt) {
+    private TimelineFeed(Key<Account> parentUserKey,
+                         Key<? extends Post> postKey,
+                         Date createdAt) {
         this.parentUserKey = parentUserKey;
         this.postKey = postKey;
         this.createdAt = createdAt;
     }
 
-    public static <T extends Post> TimelineFeed<T> newInstance(
+    public static TimelineFeed newInstance(
             final Key<Account> parentUserKey,
-            final Key<T> postKey,
+            final Key<? extends Post> postKey,
             final Date createdAt) {
-        return new TimelineFeed<>(parentUserKey, postKey, createdAt);
+        return new TimelineFeed(parentUserKey, postKey, createdAt);
     }
 
-    public Key<T> getPostKey() {
-        return postKey;
+    public Key<Post> getPostKey() {
+        return (Key<Post>) postKey;
     }
 
     public Date getCreatedAt() {
