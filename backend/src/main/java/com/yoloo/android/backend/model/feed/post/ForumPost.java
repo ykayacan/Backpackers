@@ -29,8 +29,9 @@ import java.util.Set;
 @Entity
 @Cache
 @JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "type", "content",
-        "hashtags", "locations", "status", "ups", "downs", "commentCount", "reportCount",
-        "reportedBy", "awardedBy", "awardRep", "locked", "accepted", "createdAt", "updatedAt"})
+        "hashtags", "locations", "commented", "status", "ups", "downs", "comments",
+        "reports", "reportedBy", "awardedBy", "awardRep", "locked", "accepted",
+        "createdAt", "updatedAt"})
 public class ForumPost extends Post implements Commentable {
 
     private boolean isLocked = false;
@@ -58,6 +59,9 @@ public class ForumPost extends Post implements Commentable {
     // Extra fields
 
     @Ignore
+    private boolean isCommented = false;
+
+    @Ignore
     private Vote.Status status = Vote.Status.DEFAULT;
 
     @Ignore
@@ -69,13 +73,13 @@ public class ForumPost extends Post implements Commentable {
     // Ignore the parameter. Enable it in next feature release.
     @Ignore
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    private long viewCount = 0L;
+    private long views = 0L;
 
     @Ignore
-    private long commentCount = 0L;
+    private long comments = 0L;
 
     @Ignore
-    private int reportCount = 0;
+    private int reports = 0;
 
     // Methods
 
@@ -189,6 +193,14 @@ public class ForumPost extends Post implements Commentable {
         this.updatedAt = updatedAt;
     }
 
+    public boolean isCommented() {
+        return isCommented;
+    }
+
+    public void setCommented(boolean commented) {
+        isCommented = commented;
+    }
+
     public Vote.Status getStatus() {
         return status;
     }
@@ -213,28 +225,28 @@ public class ForumPost extends Post implements Commentable {
         this.downs = downs;
     }
 
-    public long getViewCount() {
-        return viewCount;
+    public long getViews() {
+        return views;
     }
 
-    public void setViewCount(long viewCount) {
-        this.viewCount = viewCount;
+    public void setViews(long views) {
+        this.views = views;
     }
 
-    public long getCommentCount() {
-        return commentCount;
+    public long getComments() {
+        return comments;
     }
 
-    public void setCommentCount(long commentCount) {
-        this.commentCount = commentCount;
+    public void setComments(long comments) {
+        this.comments = comments;
     }
 
-    public int getReportCount() {
-        return reportCount;
+    public int getReports() {
+        return reports;
     }
 
-    public void setReportCount(int reportCount) {
-        this.reportCount = reportCount;
+    public void setReports(int reports) {
+        this.reports = reports;
     }
 
     public static abstract class Builder<T extends ForumPost> extends Post.Builder<T> {
@@ -256,14 +268,23 @@ public class ForumPost extends Post implements Commentable {
         }
 
         public Builder<T> setHashtags(List<String> hashtags) {
-            this.hashtags = hashtags == null ?
-                    Collections.<String>emptySet() : Sets.newHashSet(hashtags);
+            this.hashtags = hashtags == null
+                    ? Collections.<String>emptySet()
+                    : Sets.newHashSet(hashtags);
             return this;
         }
 
         public Builder<T> setLocations(List<Location> locations) {
-            this.locations = locations == null ?
-                    Collections.<Location>emptySet() : Sets.newHashSet(locations);
+            this.locations = locations == null
+                    ? Collections.<Location>emptySet()
+                    : Sets.newHashSet(locations);
+            return this;
+        }
+
+        public Builder<T> setLocations(Set<Location> locations) {
+            this.locations = locations == null
+                    ? Collections.<Location>emptySet()
+                    : locations;
             return this;
         }
 

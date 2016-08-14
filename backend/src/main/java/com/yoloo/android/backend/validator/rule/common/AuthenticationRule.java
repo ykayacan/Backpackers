@@ -9,7 +9,8 @@ import java.util.logging.Logger;
 
 public class AuthenticationRule implements Rule<UnauthorizedException> {
 
-    private static final Logger logger = Logger.getLogger(AuthenticationRule.class.getSimpleName());
+    private static final Logger logger =
+            Logger.getLogger(AuthenticationRule.class.getName());
 
     private final User user;
 
@@ -21,7 +22,7 @@ public class AuthenticationRule implements Rule<UnauthorizedException> {
     public void validate() throws UnauthorizedException {
         if (user == null || user.getUserId() == null) {
             throw new UnauthorizedException(
-                    "Only authenticated users may invoke this operation");
+                    "Only authenticated users may invoke this operation.");
         }
     }
 }

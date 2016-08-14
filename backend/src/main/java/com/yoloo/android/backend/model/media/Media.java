@@ -1,39 +1,37 @@
 package com.yoloo.android.backend.model.media;
 
+import com.google.api.server.spi.config.AnnotationBoolean;
+import com.google.api.server.spi.config.ApiResourceProperty;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
-import com.googlecode.objectify.condition.IfNotDefault;
 import com.yoloo.android.backend.model.user.Account;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Cache
 public class Media {
 
     @Id
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     private Long id;
 
     @Parent
     private Key<Account> parentUserKey;
 
-    private String fileName;
+    private String fileName = UUID.randomUUID().toString();
 
     private String contentType;
 
     private long size;
 
-    private boolean isUploaded = false;
-
-    @Index
     private Date createdAt;
-
-    @Index(IfNotDefault.class)
-    private Date updatedAt;
 
     private Media() {
     }
@@ -44,30 +42,33 @@ public class Media {
 
     private Media(Builder builder) {
         this.parentUserKey = builder.parentUserKey;
-        this.fileName = builder.fileName;
         this.contentType = builder.contentType;
         this.size = builder.size;
         this.createdAt = new Date();
-        this.updatedAt = new Date();
     }
 
-    public Long getId() {
-        return id;
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public Key<Media> getKey() {
+        return Key.create(parentUserKey, this.getClass(), id);
+    }
+
+    /**
+     * Gets websafe key.
+     *
+     * @return the websafe key
+     */
+    @JsonProperty("id")
+    public String getWebsafeId() {
+        return getKey().toWebSafeString();
     }
 
     public static final class Builder {
         private Key<Account> parentUserKey;
-        private String fileName;
         private String contentType;
         private long size;
 
         public Builder(Key<Account> parentUserKey) {
             this.parentUserKey = parentUserKey;
-        }
-
-        public Builder setFileName(String fileName) {
-            this.fileName = fileName;
-            return this;
         }
 
         public Builder setContentType(String contentType) {

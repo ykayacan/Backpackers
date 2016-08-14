@@ -12,6 +12,7 @@ import com.google.appengine.tools.cloudstorage.RetryParams;
 import com.googlecode.objectify.Key;
 import com.yoloo.android.backend.model.media.Media;
 import com.yoloo.android.backend.model.media.MediaToken;
+import com.yoloo.android.backend.model.user.Account;
 import com.yoloo.android.backend.util.RandomGenerator;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -36,7 +37,8 @@ import static com.yoloo.android.backend.service.OfyHelper.ofy;
 
 public class UploadServlet extends HttpServlet {
 
-    private static final Logger logger = Logger.getLogger(UploadServlet.class.getSimpleName());
+    private static final Logger logger =
+            Logger.getLogger(UploadServlet.class.getName());
 
     /** Used below to determine the size of chucks to read in. Should be > 1kb and < 10MB */
     private static final int BUFFER_SIZE = 2 * 1024 * 1024;
@@ -45,19 +47,25 @@ public class UploadServlet extends HttpServlet {
 
     private static final String ACL = "public-read";
 
-    private final GcsService gcsService = GcsServiceFactory.createGcsService(new RetryParams.Builder()
-            .initialRetryDelayMillis(10)
-            .retryMaxAttempts(10)
-            .totalRetryPeriodMillis(15000)
-            .build());
-
     private static final String BASE_BUCKETNAME = "yoloo-app.appspot.com";
 
     private static final String MEDIA_BUCKET = BASE_BUCKETNAME + "/" + "media";
 
+    private static final String WEBSAFE_USER_ID = "websafeUserId";
+
+    private final GcsService gcsService = GcsServiceFactory
+            .createGcsService(new RetryParams.Builder()
+                    .initialRetryDelayMillis(10)
+                    .retryMaxAttempts(10)
+                    .totalRetryPeriodMillis(15000)
+                    .build());
+
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final String token = req.getHeader("X-Upload-Token");
+        final String websafeUserId = req.getParameter(WEBSAFE_USER_ID);
+
+        final Key<Account> userKey = Key.create(websafeUserId);
 
         final PrintWriter out = resp.getWriter();
 
@@ -74,16 +82,6 @@ public class UploadServlet extends HttpServlet {
         }
 
         final Key<MediaToken> tokenKey = Key.create(token);
-
-        final MediaToken mediaToken = ofy().load()
-                .type(MediaToken.class)
-                .id(tokenKey.getId()).now();
-
-        if (mediaToken == null) {
-            out.print("Invalid token.");
-            out.close();
-            return;
-        }
 
         // Parse the request
         final FileItemIterator iterator;
@@ -105,33 +103,32 @@ public class UploadServlet extends HttpServlet {
                     GcsFilename gcsFilename = new GcsFilename(MEDIA_BUCKET,
                             RandomGenerator.INSTANCE.generate());
 
-                    GcsOutputChannel outputChannel = gcsService.createOrReplace(gcsFilename, gcsFileOptions);
+                    GcsOutputChannel outputChannel =
+                            gcsService.createOrReplace(gcsFilename, gcsFileOptions);
 
                     copy(stream, Channels.newOutputStream(outputChannel));
 
                     GcsFileMetadata metadata = gcsService.getMetadata(gcsFilename);
 
-                    /*final Media media = new Media.Builder()
-                            .setFileName(metadata.getFilename().getObjectName())
+                    final Media media = new Media.Builder(userKey)
                             .setContentType(metadata.getOptions().getMimeType())
                             .setSize(metadata.getLength())
                             .build();
 
-                    medias.add(media);*/
+                    medias.add(media);
                 }
             }
 
-            //mediaToken.delete();
+            ofy().delete().key(tokenKey).now();
+
             ofy().save().entities(medias).now();
 
             for (Media m : medias) {
-                out.print(m.getId());
+                out.print(m.getWebsafeId());
             }
             out.close();
         } catch (FileUploadException | IllegalArgumentException e) {
             e.printStackTrace();
-            out.print("Invalid token.");
-            out.close();
         }
     }
 

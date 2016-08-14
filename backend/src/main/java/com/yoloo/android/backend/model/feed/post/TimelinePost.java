@@ -25,8 +25,8 @@ import java.util.Set;
 
 @Entity
 @JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "type", "content",
-        "hashtags", "locations", "liked", "likeCount", "commentCount", "reportCount",
-        "reportedBy", "createdAt", "updatedAt"})
+        "hashtags", "locations", "commented", "liked", "likes", "comments",
+        "reports", "reportedBy", "createdAt", "updatedAt"})
 public class TimelinePost extends Post implements Commentable {
 
     @Index
@@ -47,13 +47,16 @@ public class TimelinePost extends Post implements Commentable {
     private boolean isLiked = false;
 
     @Ignore
-    private long likeCount = 0L;
+    private boolean isCommented = false;
 
     @Ignore
-    private long commentCount = 0L;
+    private long likes = 0L;
 
     @Ignore
-    private int reportCount = 0;
+    private long comments = 0L;
+
+    @Ignore
+    private int reports = 0;
 
     // Methods
 
@@ -131,6 +134,14 @@ public class TimelinePost extends Post implements Commentable {
         isLiked = liked;
     }
 
+    public boolean isCommented() {
+        return isCommented;
+    }
+
+    public void setCommented(boolean commented) {
+        isCommented = commented;
+    }
+
     public Set<Location> getLocations() {
         return locations;
     }
@@ -139,28 +150,28 @@ public class TimelinePost extends Post implements Commentable {
         this.locations = locations;
     }
 
-    public long getLikeCount() {
-        return likeCount;
+    public long getLikes() {
+        return likes;
     }
 
-    public void setLikeCount(long likeCount) {
-        this.likeCount = likeCount;
+    public void setLikes(long likes) {
+        this.likes = likes;
     }
 
-    public long getCommentCount() {
-        return commentCount;
+    public long getComments() {
+        return comments;
     }
 
-    public void setCommentCount(long commentCount) {
-        this.commentCount = commentCount;
+    public void setComments(long comments) {
+        this.comments = comments;
     }
 
-    public int getReportCount() {
-        return reportCount;
+    public int getReports() {
+        return reports;
     }
 
-    public void setReportCount(int reportCount) {
-        this.reportCount = reportCount;
+    public void setReports(int reports) {
+        this.reports = reports;
     }
 
     public static abstract class Builder<T extends TimelinePost> extends Post.Builder<T> {
@@ -174,14 +185,23 @@ public class TimelinePost extends Post implements Commentable {
         }
 
         public Builder<T> setHashtags(List<String> hashtags) {
-            this.hashtags = hashtags == null ?
-                    Collections.<String>emptySet() : Sets.newHashSet(hashtags);
+            this.hashtags = hashtags == null
+                    ? Collections.<String>emptySet()
+                    : Sets.newHashSet(hashtags);
             return this;
         }
 
         public Builder<T> setLocations(List<Location> locations) {
-            this.locations = locations == null ?
-                    Collections.<Location>emptySet() : Sets.newHashSet(locations);
+            this.locations = locations == null
+                    ? Collections.<Location>emptySet()
+                    : Sets.newHashSet(locations);
+            return this;
+        }
+
+        public Builder<T> setLocations(Set<Location> locations) {
+            this.locations = locations == null
+                    ? Collections.<Location>emptySet()
+                    : locations;
             return this;
         }
     }

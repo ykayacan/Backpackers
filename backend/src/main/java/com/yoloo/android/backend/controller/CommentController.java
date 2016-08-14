@@ -45,8 +45,8 @@ public class CommentController {
     public void remove(final String websafeCommentableId,
                        final String websafeCommentId,
                        final User user) {
-        Key<Account> userKey = Key.create(user.getUserId());
-        Key<? extends Commentable> commentableKey = Key.create(websafeCommentableId);
+        //Key<Account> userKey = Key.create(user.getUserId());
+        //Key<? extends Commentable> commentableKey = Key.create(websafeCommentableId);
         Key<Comment> commentKey = Key.create(websafeCommentId);
 
         List<Key<Like>> likeKeys = ofy().load().type(Like.class)

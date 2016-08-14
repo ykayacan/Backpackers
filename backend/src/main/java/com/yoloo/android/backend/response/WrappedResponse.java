@@ -1,8 +1,8 @@
 package com.yoloo.android.backend.response;
 
 public class WrappedResponse implements Response {
+
     private int code;
-    private Status status;
     private String message;
     private Object item;
 
@@ -11,7 +11,6 @@ public class WrappedResponse implements Response {
 
     private WrappedResponse(Builder builder) {
         this.code = builder.code;
-        this.status = builder.status;
         this.message = builder.message;
         this.item = builder.item;
     }
@@ -24,10 +23,6 @@ public class WrappedResponse implements Response {
         return code;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
     public String getMessage() {
         return message;
     }
@@ -38,17 +33,11 @@ public class WrappedResponse implements Response {
 
     public static final class Builder {
         private int code;
-        private Status status;
         private String message;
         private Object item;
 
         public Builder setCode(int code) {
             this.code = code;
-            return this;
-        }
-
-        public Builder setStatus(Status status) {
-            this.status = status;
             return this;
         }
 

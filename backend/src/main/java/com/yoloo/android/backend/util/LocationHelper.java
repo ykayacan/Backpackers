@@ -235,7 +235,7 @@ public final class LocationHelper {
                         * Math.cos(lat2) * Math.cos(Math.abs(long1 - long2)));
     }
 
-    public static GeoPt createLocationFromString(String latLng) {
+    public static GeoPt createLocation(String latLng) {
         final List<String> coords = StringUtil.splitValueByToken(latLng, ",");
 
         return new GeoPt(Float.valueOf(coords.get(0)), Float.valueOf(coords.get(1)));
@@ -243,25 +243,25 @@ public final class LocationHelper {
 
     public static List<Location> getLocationList(String locationArgs,
                                                  Key<? extends Post> postKey) {
-        return ImmutableList.copyOf(getLocations(locationArgs, postKey));
+        return ImmutableList.copyOf(getLocationsList(locationArgs, postKey));
     }
 
     public static Set<Location> getLocationSet(String locationArgs,
                                                Key<? extends Post> postKey) {
-        return ImmutableSet.copyOf(getLocations(locationArgs, postKey));
+        return ImmutableSet.copyOf(getLocationsList(locationArgs, postKey));
     }
 
-    private static List<Location> getLocations(String locationArgs,
-                                        Key<? extends Post> postKey) {
+    private static List<Location> getLocationsList(String locationArgs,
+                                                   Key<? extends Post> postKey) {
         List<String> locationParts = StringUtil.splitValueByToken(locationArgs, ";");
         List<Location> locations = new ArrayList<>(3);
         for (String part : locationParts) {
-            List<String> block = StringUtil.splitValueByToken(part, ":");
+            List<String> block = StringUtil.split(part, ":");
 
             Location location = Location.builder()
                     .setPostKey(postKey)
                     .setName(block.get(0))
-                    .setGeoPt(LocationHelper.createLocationFromString(block.get(1)))
+                    .setGeoPt(LocationHelper.createLocation(block.get(1)))
                     .build();
 
             locations.add(location);

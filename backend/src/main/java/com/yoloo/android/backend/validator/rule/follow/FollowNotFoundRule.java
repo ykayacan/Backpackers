@@ -12,11 +12,11 @@ import static com.yoloo.android.backend.service.OfyHelper.ofy;
 
 public class FollowNotFoundRule implements Rule<NotFoundException> {
 
-    private final String websafeFolloweeKey;
+    private final String websafeFolloweeId;
     private final User user;
 
-    public FollowNotFoundRule(String websafeFolloweeKey, User user) {
-        this.websafeFolloweeKey = websafeFolloweeKey;
+    public FollowNotFoundRule(String websafeFolloweeId, User user) {
+        this.websafeFolloweeId = websafeFolloweeId;
         this.user = user;
     }
 
@@ -24,7 +24,7 @@ public class FollowNotFoundRule implements Rule<NotFoundException> {
     public void validate() throws NotFoundException {
         try {
             Key<Account> followerKey = Key.create(user.getUserId());
-            Key<Account> followeeKey = Key.create(websafeFolloweeKey);
+            Key<Account> followeeKey = Key.create(websafeFolloweeId);
 
             ofy().load().type(Follow.class)
                     .ancestor(followerKey)

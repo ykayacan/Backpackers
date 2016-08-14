@@ -6,14 +6,12 @@ import java.util.Collection;
 
 public class WrappedCollectionResponse<T> extends CollectionResponse<T> implements Response {
 
-    private final int statusCode;
-    private final Status status;
+    private final int code;
     private final String message;
 
     private WrappedCollectionResponse(Builder<T> builder) {
         super(builder.items, builder.nextPageToken);
-        this.statusCode = builder.statusCode;
-        this.status = builder.status;
+        this.code = builder.code;
         this.message = builder.message;
     }
 
@@ -21,28 +19,22 @@ public class WrappedCollectionResponse<T> extends CollectionResponse<T> implemen
         return new WrappedCollectionResponse.Builder<>();
     }
 
+    public int getCode() {
+        return code;
+    }
+
     public String getMessage() {
         return message;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
     public static class Builder<T> extends CollectionResponse.Builder<T> {
-        private int statusCode;
-        private Status status;
+        private int code;
         private String message;
         private Collection<T> items;
         private String nextPageToken;
 
-        public WrappedCollectionResponse.Builder<T> setStatusCode(int statusCode) {
-            this.statusCode = statusCode;
-            return this;
-        }
-
-        public WrappedCollectionResponse.Builder<T> setStatus(Status status) {
-            this.status = status;
+        public WrappedCollectionResponse.Builder<T> setCode(int code) {
+            this.code = code;
             return this;
         }
 

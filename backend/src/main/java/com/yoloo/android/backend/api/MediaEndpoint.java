@@ -14,6 +14,8 @@ import com.yoloo.android.backend.authenticator.YolooAuthenticator;
 import com.yoloo.android.backend.model.media.MediaToken;
 import com.yoloo.android.backend.response.WrappedString;
 
+import static com.yoloo.android.backend.service.OfyHelper.ofy;
+
 @Api(
         name = "yolooApi",
         version = "v1",
@@ -39,16 +41,20 @@ import com.yoloo.android.backend.response.WrappedString;
 public class MediaEndpoint {
 
     @ApiMethod(
-            name = "media.upload",
-            path = "media/",
+            name = "medias.token",
+            path = "medias/",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public WrappedString getTicket() throws ServiceException {
-        // Validate.
+    public WrappedString getToken() throws ServiceException {
+
         /*Validator.builder()
                 .addRule(new AuthenticationRule(parentUserKey))
                 .validate();*/
 
-        final Key<MediaToken> tokenKey = null;
+        Key<MediaToken> tokenKey = ofy().factory().allocateId(MediaToken.class);
+
+        //final MediaToken token = new MediaToken();
+
+        //ofy().save().entity(token).now();
 
         return new WrappedString(tokenKey.toWebSafeString());
     }

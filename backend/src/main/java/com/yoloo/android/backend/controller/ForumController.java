@@ -1,17 +1,17 @@
 package com.yoloo.android.backend.controller;
 
-import com.google.api.client.util.Strings;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.users.User;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.LoadResult;
 import com.googlecode.objectify.cmd.Query;
-import com.yoloo.android.backend.PostFactory;
+import com.yoloo.android.backend.factory.ForumPostFactory;
+import com.yoloo.android.backend.factory.PostFactory;
+import com.yoloo.android.backend.model.comment.Comment;
 import com.yoloo.android.backend.model.feed.post.ForumPost;
 import com.yoloo.android.backend.model.feed.post.Post;
 import com.yoloo.android.backend.model.follow.Follow;
@@ -19,24 +19,21 @@ import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
 import com.yoloo.android.backend.model.user.UserCounterShard;
 import com.yoloo.android.backend.model.vote.Vote;
-import com.yoloo.android.backend.servlet.CreateTimelineServlet;
-import com.yoloo.android.backend.util.LocationHelper;
-import com.yoloo.android.backend.util.StringUtil;
+import com.yoloo.android.backend.util.CommentHelper;
+import com.yoloo.android.backend.util.TimelineUtil;
 import com.yoloo.android.backend.util.VoteHelper;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
 import static com.yoloo.android.backend.service.OfyHelper.ofy;
 
-public class ForumController {
+public class ForumController extends PostController {
 
     private static final Logger logger =
             Logger.getLogger(ForumController.class.getName());
@@ -85,30 +82,28 @@ public class ForumController {
         final Account account = ofy().load().key(userKey).now();
 
         // Allocate an id with parent user key.
-        final Key<ForumPost> postKey =
+        final Key<? extends Post> postKey =
                 ofy().factory().allocateId(userKey, ForumPost.class);
+
+        // Create a new post.
+        final ForumPost post = (ForumPost) PostFactory.getPost(
+                new ForumPostFactory(
+                        postKey, account, content, hashtags,
+                        locations, isLocked, awardRep));
 
         // TODO: 12.08.2016 Gamification here.
 
-        // Create a new post.
-        final ForumPost post = new PostFactory()
-                .createForumPost(postKey, account, content, hashtags,
-                        locations, isLocked, awardRep);
-
         // Increase question counter of the current user.
-        final UserCounterShard counter = loadAndIncreaseUserQuestionCounter(userKey);
-
-        // Add all entities to an immutable list.
-        List<Object> saveList = ImmutableList.builder()
-                .add(post)
-                .add(counter)
-                .addAll(post.getLocations())
-                .build();
+        final UserCounterShard shard = loadAndIncreaseUserQuestionCounter(userKey);
 
         // Batch save entities
-        ofy().save().entities(saveList);
+        ofy().save().entities(ImmutableList.builder()
+                .add(post)
+                .add(shard)
+                .addAll(post.getLocations())
+                .build());
 
-        writeToFollowersTimeline(userKey, followResult, post);
+        TimelineUtil.updateTimeline(userKey, followResult, post);
 
         return post;
     }
@@ -128,29 +123,28 @@ public class ForumController {
 
         final ForumPost post = ofy().load().key(postKey).now();
 
-        ImmutableList<LoadResult<Key<Vote>>> loadResults =
+        ImmutableList<LoadResult<Key<Vote>>> asyncVoteResult =
                 VoteHelper.loadAsyncVoteKeys(userKey, postKey);
-
-        List<Object> saveList = new ArrayList<>(2);
-
-        // Check if any part of the entity is changed.
-        boolean isUpdated;
+        final LoadResult<Key<Comment>> asyncCommentsResult =
+                CommentHelper.loadAsyncComments(userKey, postKey);
 
         // TODO: 10.08.2016 Add mediaId case.
 
-        isUpdated = updateContent(content, post, false);
-        isUpdated = updateHashtags(hashtags, post, isUpdated);
-        isUpdated = updateLocations(locations, postKey, post, saveList, isUpdated);
-        isUpdated = updateLocked(isLocked, post, isUpdated);
-        isUpdated = updateAward(awardRep, userKey, post, isUpdated);
-        isUpdated = updateAccepted(isAccepted, post, isUpdated);
-        updateDate(post, isUpdated);
+        updateContent(post, content);
+        updateHashtags(post, hashtags);
+        updateLocations(post, locations);
+        updateLocked(post, isLocked);
+        updateAward(post, userKey, awardRep);
+        updateAccepted(post, isAccepted);
+        updateDate(post);
 
-        saveList.add(post);
+        VoteHelper.aggregateVotes(post, asyncVoteResult);
+        CommentHelper.aggregateComments(post, asyncCommentsResult);
 
-        VoteHelper.aggregateVotes(post, loadResults);
-
-        ofy().save().entities(saveList);
+        ofy().save().entities(ImmutableList.builder()
+                .add(post)
+                .addAll(post.getLocations())
+                .build());
 
         return post;
     }
@@ -217,93 +211,27 @@ public class ForumController {
         // Store async batch in a hashmap. LinkedHashMap preserve insertion order.
         final Map<Key<? extends Post>, List<LoadResult<Key<Vote>>>> votedKeysMap =
                 new LinkedHashMap<>(limit);
+        final Map<Key<? extends Post>, LoadResult<Key<Comment>>> commentKeysMap =
+                new LinkedHashMap<>(limit);
 
         final List<ForumPost> posts = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             // Get post key.
             final ForumPost post = queryIterator.next();
+            final Key<? extends Post> postKey = post.getKey();
             posts.add(post);
 
-            votedKeysMap.put(post.getKey(), VoteHelper.loadAsyncVoteKeys(userKey, post.getKey()));
+            votedKeysMap.put(postKey, VoteHelper.loadAsyncVoteKeys(userKey, postKey));
+            commentKeysMap.put(postKey, CommentHelper.loadAsyncComments(userKey, postKey));
         }
 
         VoteHelper.aggregateVotes(posts, votedKeysMap);
+        CommentHelper.aggregateComments(posts, commentKeysMap);
 
         return CollectionResponse.<ForumPost>builder()
                 .setItems(posts)
                 .setNextPageToken(queryIterator.getCursor().toWebSafeString())
                 .build();
-    }
-
-    private void updateDate(ForumPost post, boolean isUpdated) {
-        if (isUpdated) {
-            post.setUpdatedAt(new Date());
-        }
-    }
-
-    private boolean updateAccepted(Boolean isAccepted, ForumPost post, boolean isUpdated) {
-        if (isAccepted != null) {
-            post.setAccepted(isAccepted);
-            isUpdated = true;
-        }
-        return isUpdated;
-    }
-
-    private boolean updateAward(Integer awardRep, Key<Account> userKey,
-                                ForumPost post, boolean isUpdated) {
-        if (awardRep != null) {
-            post.setAwardedBy(userKey);
-            post.setAwardRep(awardRep);
-            isUpdated = true;
-        }
-        return isUpdated;
-    }
-
-    private boolean updateLocked(Boolean isLocked, ForumPost post, boolean isUpdated) {
-        if (isLocked != null) {
-            post.setLocked(isLocked);
-            isUpdated = true;
-        }
-        return isUpdated;
-    }
-
-    private boolean updateLocations(String locations, Key<ForumPost> postKey, ForumPost post,
-                                    List<Object> saveList, boolean isUpdated) {
-        if (!Strings.isNullOrEmpty(locations)) {
-            // Find related Location entities with the given post key.
-            List<Key<Location>> locationKeys = ofy().load().type(Location.class)
-                    .filter("postKey =", postKey).keys().list();
-
-            // Delete all entities.
-            ofy().delete().keys(locationKeys);
-
-            // Generate locations from given string with immutable way.
-            Set<Location> locationSet =
-                    ImmutableSet.copyOf(LocationHelper.getLocationList(locations, postKey));
-            post.setLocations(locationSet);
-
-            saveList.addAll(locationSet);
-
-            isUpdated = true;
-        }
-        return isUpdated;
-    }
-
-    private boolean updateHashtags(String hashtags, ForumPost post, boolean isUpdated) {
-        if (!Strings.isNullOrEmpty(hashtags)) {
-            post.getHashtags().clear();
-            post.getHashtags().addAll(StringUtil.splitValueByToken(hashtags, ","));
-            isUpdated = true;
-        }
-        return isUpdated;
-    }
-
-    private boolean updateContent(String content, ForumPost post, boolean isUpdated) {
-        if (!Strings.isNullOrEmpty(content)) {
-            post.setContent(content);
-            isUpdated = true;
-        }
-        return isUpdated;
     }
 
     private UserCounterShard loadAndIncreaseUserQuestionCounter(Key<Account> userKey) {
@@ -314,18 +242,5 @@ public class ForumController {
 
         shard.setQuestionCount(shard.getQuestionCount() + 1);
         return shard;
-    }
-
-    private void writeToFollowersTimeline(Key<Account> userKey,
-                                          LoadResult<Key<Follow>> followResult,
-                                          Post post) {
-        // The user is followed by someone.
-        if (followResult.now() != null) {
-            // Write post to user's followers timeline.
-            CreateTimelineServlet.create(
-                    userKey.toWebSafeString(),
-                    post.getWebsafeId(),
-                    String.valueOf(post.getCreatedAt().getTime()));
-        }
     }
 }

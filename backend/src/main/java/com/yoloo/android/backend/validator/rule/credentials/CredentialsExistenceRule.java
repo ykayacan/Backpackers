@@ -20,11 +20,11 @@ public class CredentialsExistenceRule implements Rule<ServiceException> {
     @Override
     public void validate() throws ServiceException {
         if (values.length != 3) {
-            throw new BadRequestException("Invalid credentials");
+            throw new BadRequestException("Invalid credentials.");
         }
 
         if (isUserExists()) {
-            throw new ConflictException("Username or email is already taken");
+            throw new ConflictException("Username or email is already taken.");
         }
     }
 
