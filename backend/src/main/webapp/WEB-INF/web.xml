@@ -55,7 +55,6 @@
                 com.yoloo.android.backend.api.CommentEndpoint,
                 com.yoloo.android.backend.api.FollowEndpoint,
                 com.yoloo.android.backend.api.TokenEndpoint,
-                com.yoloo.android.backend.api.MediaEndpoint,
                 com.yoloo.android.backend.api.PostEndpoint,
                 com.yoloo.android.backend.api.VoteEndpoint
             </param-value>
