@@ -11,7 +11,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
-import com.yoloo.android.backend.model.Photo;
+import com.yoloo.android.backend.model.Image;
 import com.yoloo.android.backend.model.like.Likeable;
 import com.yoloo.android.backend.model.user.Account;
 
@@ -55,7 +55,7 @@ public class Post implements Likeable {
     /**
      * The Photos.
      */
-    protected List<Photo> photos;
+    protected List<Image> mImages;
 
     /**
      * The Created at.
@@ -79,7 +79,7 @@ public class Post implements Likeable {
         this.profileImageUrl = builder.profileImageUrl;
         this.username = builder.username;
         this.content = builder.content;
-        this.photos = builder.images;
+        this.mImages = builder.images;
         this.createdAt = new Date();
     }
 
@@ -108,7 +108,7 @@ public class Post implements Likeable {
     }
 
     @JsonProperty("ownerId")
-    public String getParentUserKey() {
+    public String getWebsafeParentUserId() {
         return parentUserKey.toWebSafeString();
     }
 
@@ -134,16 +134,16 @@ public class Post implements Likeable {
     }
 
     @JsonProperty("images")
-    public List<Photo> getPhotos() {
-        return photos;
+    public List<Image> getImages() {
+        return mImages;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+    public void setImages(List<Image> images) {
+        this.mImages = images;
     }
 
-    public void addImage(Photo photo) {
-        this.photos.add(photo);
+    public void addImage(Image image) {
+        this.mImages.add(image);
     }
 
     public Date getCreatedAt() {
@@ -171,7 +171,7 @@ public class Post implements Likeable {
         protected Link profileImageUrl;
         protected String username;
         protected String content;
-        protected List<Photo> images;
+        protected List<Image> images;
 
         public Builder<T> setKey(Key<?> key) {
             this.id = key.getId();
@@ -204,8 +204,8 @@ public class Post implements Likeable {
             return this;
         }
 
-        public Builder<T> setImages(List<Photo> photos) {
-            this.images = photos;
+        public Builder<T> setImages(List<Image> images) {
+            this.images = images;
             return this;
         }
 

@@ -46,7 +46,7 @@ public class WrappedResponse implements Response {
             return this;
         }
 
-        public Builder setItem(Object item) {
+        public Builder setItems(Object item) {
             this.item = item;
             return this;
         }

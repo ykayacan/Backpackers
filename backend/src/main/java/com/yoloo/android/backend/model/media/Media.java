@@ -1,37 +1,37 @@
 package com.yoloo.android.backend.model.media;
 
-import com.google.api.server.spi.config.AnnotationBoolean;
-import com.google.api.server.spi.config.ApiResourceProperty;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonPropertyOrder;
+import com.google.appengine.tools.cloudstorage.GcsFileMetadata;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Parent;
 import com.yoloo.android.backend.model.user.Account;
 
-import java.util.Date;
-import java.util.UUID;
-
 @Entity
-@Cache
+@JsonPropertyOrder({"id", "type", "size"})
 public class Media {
 
     @Id
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    @JsonIgnore
     private Long id;
 
     @Parent
+    @JsonIgnore
     private Key<Account> parentUserKey;
 
-    private String fileName = UUID.randomUUID().toString();
+    @JsonIgnore
+    private GcsFileMetadata meta;
 
-    private String contentType;
+    // Extra params.
 
-    private long size;
-
-    private Date createdAt;
+    @JsonProperty("detail")
+    @Ignore
+    private Resolution resolution;
 
     private Media() {
     }
@@ -42,14 +42,13 @@ public class Media {
 
     private Media(Builder builder) {
         this.parentUserKey = builder.parentUserKey;
-        this.contentType = builder.contentType;
-        this.size = builder.size;
-        this.createdAt = new Date();
+        this.meta = builder.meta;
+        this.resolution = builder.data;
     }
 
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    @JsonIgnore
     public Key<Media> getKey() {
-        return Key.create(parentUserKey, this.getClass(), id);
+        return Key.create(parentUserKey, Media.class, id);
     }
 
     /**
@@ -62,22 +61,36 @@ public class Media {
         return getKey().toWebSafeString();
     }
 
+    @JsonIgnore
+    public String getWebsafeParentUserId() {
+        return parentUserKey.toWebSafeString();
+    }
+
+    @JsonProperty("type")
+    public String getType() {
+        return this.meta.getOptions().getMimeType();
+    }
+
+    public long getSize() {
+        return this.meta.getLength();
+    }
+
     public static final class Builder {
         private Key<Account> parentUserKey;
-        private String contentType;
-        private long size;
+        private GcsFileMetadata meta;
+        private Resolution data;
 
         public Builder(Key<Account> parentUserKey) {
             this.parentUserKey = parentUserKey;
         }
 
-        public Builder setContentType(String contentType) {
-            this.contentType = contentType;
+        public Builder setMeta(GcsFileMetadata meta) {
+            this.meta = meta;
             return this;
         }
 
-        public Builder setSize(long size) {
-            this.size = size;
+        public Builder setData(Resolution data) {
+            this.data = data;
             return this;
         }
 

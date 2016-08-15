@@ -7,6 +7,9 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
+import com.yoloo.android.backend.factory.user.GoogleUserFactory;
+import com.yoloo.android.backend.factory.user.UserFactory;
+import com.yoloo.android.backend.factory.user.YolooUserFactory;
 import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.user.Account;
 import com.yoloo.android.backend.model.user.UserCounterShard;
@@ -14,7 +17,7 @@ import com.yoloo.android.backend.model.user.UserIndexShardCounter;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 import static com.yoloo.android.backend.service.OfyHelper.ofy;
@@ -27,13 +30,13 @@ public class UserController {
     private static final int INITIAL_SHARDS = 3;
 
     private static final Logger logger =
-            Logger.getLogger(UserController.class.getSimpleName());
+            Logger.getLogger(UserController.class.getName());
 
     /**
-     * A random number generating, for distributing writes across shards.
+     * New instance user controller.
+     *
+     * @return the user controller
      */
-    private final Random generator = new Random();
-
     public static UserController newInstance() {
         return new UserController();
     }
@@ -67,12 +70,18 @@ public class UserController {
         });
     }
 
-    public Account get(final String websafeUserKey) {
-        Key<Account> userKey = Key.create(websafeUserKey);
+    /**
+     * Get account.
+     *
+     * @param websafeUserId the websafe user key
+     * @return the account
+     */
+    public Account get(final String websafeUserId) {
+        final Key<Account> userKey = Key.create(websafeUserId);
 
-        Account account = ofy().load().key(userKey).now();
+        final Account account = ofy().load().key(userKey).now();
 
-        List<UserCounterShard> shards =
+        final List<UserCounterShard> shards =
                 ofy().load().type(UserCounterShard.class).ancestor(userKey).list();
 
         setExtraUserFields(account, shards);
@@ -80,43 +89,46 @@ public class UserController {
         return account;
     }
 
+    /**
+     * Add account.
+     *
+     * @param payload the payload
+     * @return the account
+     */
     public Account add(final GoogleIdToken.Payload payload) {
         // Allocate a new Id.
-        Key<Account> userKey = ofy().factory().allocateId(Account.class);
+        final Key<Account> userKey = ofy().factory().allocateId(Account.class);
 
-        Account account = Account.builder(userKey)
-                .setUsername((String) payload.get("name"))
-                .setEmail(payload.getEmail())
-                .setProvider(Account.Provider.GOOGLE)
-                .setRealname((String) payload.get("given_name"))
-                .setProfileImageUrl(payload.get("picture") != null ?
-                        (String) payload.get("picture") : "https://s31.postimg.org/bgayiukkb/dummy_user_icon.jpg")
-                .build();
+        final Account account = UserFactory.getAccount(new GoogleUserFactory(userKey, payload));
 
-        final UserCounterShard userCounterShard =
-                UserCounterShard.builder(1, userKey).build();
+        final UserCounterShard shard = UserCounterShard.builder(1, userKey).build();
 
-        return save(account, userCounterShard);
+        return save(account, shard);
     }
 
+    /**
+     * Add account.
+     *
+     * @param values the values
+     * @return the account
+     */
     public Account add(final String[] values) {
         // Allocate a new Id.
         final Key<Account> userKey = ofy().factory().allocateId(Account.class);
 
-        final Account account = Account.builder(userKey)
-                .setUsername(values[0])
-                .setPassword(values[1])
-                .setEmail(values[2])
-                .setProvider(Account.Provider.YOLOO)
-                .setProfileImageUrl("https://s31.postimg.org/bgayiukkb/dummy_user_icon.jpg")
-                .build();
+        final Account account = UserFactory.getAccount(new YolooUserFactory(userKey, values));
 
-        final UserCounterShard userCounterShard =
-                UserCounterShard.builder(1, userKey).build();
+        final UserCounterShard shard = UserCounterShard.builder(1, userKey).build();
 
-        return save(account, userCounterShard);
+        return save(account, shard);
     }
 
+    /**
+     * Follow.
+     *
+     * @param websafeFolloweeId the websafe followee id
+     * @param user              the user
+     */
     public void follow(final String websafeFolloweeId, final User user) {
         final Key<Account> followerKey = Key.create(user.getUserId());
         final Key<Account> followeeKey = Key.create(websafeFolloweeId);
@@ -127,11 +139,18 @@ public class UserController {
         int numShards = getShardCount(followeeKey);
 
         // Choose the shard randomly from the available shards.
-        final int shardNum = generator.nextInt(numShards) + 1;
+        // Add +1 to numShards to make it inclusive.
+        final int shardNum = ThreadLocalRandom.current().nextInt(1, numShards + 1);
 
         runFollowTransact(followerKey, followeeKey, follow, shardNum);
     }
 
+    /**
+     * Unfollow.
+     *
+     * @param websafeFolloweeId the websafe followee id
+     * @param user              the user
+     */
     public void unfollow(final String websafeFolloweeId, final User user) {
         Key<Account> followerKey = Key.create(user.getUserId());
         Key<Account> followeeKey = Key.create(websafeFolloweeId);
@@ -153,7 +172,8 @@ public class UserController {
         runUnfollowTransact(followKey, followerShard, followeeShard);
     }
 
-    private void runFollowTransact(final Key<Account> followerKey, final Key<Account> followeeKey,
+    private void runFollowTransact(final Key<Account> followerKey,
+                                   final Key<Account> followeeKey,
                                    final Follow follow, final int shardNum) {
         ofy().transact(new VoidWork() {
             @Override
@@ -186,7 +206,9 @@ public class UserController {
         });
     }
 
-    private void runUnfollowTransact(final Key<Follow> followKey, final UserCounterShard followerShard, final UserCounterShard followeeShard) {
+    private void runUnfollowTransact(final Key<Follow> followKey,
+                                     final UserCounterShard followerShard,
+                                     final UserCounterShard followeeShard) {
         ofy().transact(new VoidWork() {
             @Override
             public void vrun() {
@@ -197,13 +219,13 @@ public class UserController {
     }
 
     private Account save(final Account account,
-                         final UserCounterShard userCounterShard) {
+                         final UserCounterShard shard) {
         return ofy().transact(new Work<Account>() {
             @Override
             public Account run() {
-                ofy().save().entities(account, userCounterShard).now();
+                ofy().save().entities(account, shard).now();
 
-                setExtraUserFields(account, Collections.singletonList(userCounterShard));
+                setExtraUserFields(account, Collections.singletonList(shard));
                 return account;
             }
         });

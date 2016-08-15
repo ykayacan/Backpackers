@@ -50,11 +50,9 @@ public class MediaEndpoint {
                 .addRule(new AuthenticationRule(parentUserKey))
                 .validate();*/
 
-        Key<MediaToken> tokenKey = ofy().factory().allocateId(MediaToken.class);
+        final MediaToken token = new MediaToken();
 
-        //final MediaToken token = new MediaToken();
-
-        //ofy().save().entity(token).now();
+        final Key<MediaToken> tokenKey = ofy().save().entity(token).now();
 
         return new WrappedString(tokenKey.toWebSafeString());
     }

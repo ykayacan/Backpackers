@@ -24,6 +24,18 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!--<filter>
+        <filter-name>ValidationFilter</filter-name>
+        <filter-class>com.yoloo.android.backend.filter.ValidationFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ValidationFilter</filter-name>
+        <url-pattern>/upload</url-pattern>
+    </filter-mapping>-->
+
+    <!-- Listeners -->
+
     <listener>
         <listener-class>com.yoloo.android.backend.service.OfyHelper</listener-class>
     </listener>

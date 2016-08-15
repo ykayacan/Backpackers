@@ -3,7 +3,6 @@ package com.yoloo.android.backend.service;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
-import com.yoloo.android.backend.model.Photo;
 import com.yoloo.android.backend.model.RegistrationRecord;
 import com.yoloo.android.backend.model.Token;
 import com.yoloo.android.backend.model.comment.Comment;
@@ -34,7 +33,6 @@ public class OfyHelper {
         factory().register(UserIndexShardCounter.class);
         factory().register(PostCounterShard.class);
         factory().register(Location.class);
-        factory().register(Photo.class);
         factory().register(RegistrationRecord.class);
         factory().register(MediaToken.class);
         factory().register(Media.class);
