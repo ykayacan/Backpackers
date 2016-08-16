@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 
 import com.googlecode.objectify.Key;
 import com.yoloo.android.backend.model.feed.TimelineFeed;
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 import com.yoloo.android.backend.model.like.Like;
 import com.yoloo.android.backend.model.location.Location;
 
@@ -37,7 +37,7 @@ public class RemoveTimelineServlet extends HttpServlet {
             throws ServletException, IOException {
         final String websafePostId = req.getParameter(WEBSAFE_POST_ID);
 
-        final Key<? extends Post> postKey = Key.create(websafePostId);
+        final Key<? extends AbstractPost> postKey = Key.create(websafePostId);
 
         List<Key<TimelineFeed>> feedKeys = ofy().load()
                 .type(TimelineFeed.class).filter("postKey =", postKey).keys().list();

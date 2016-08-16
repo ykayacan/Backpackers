@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.LoadResult;
 import com.yoloo.android.backend.model.feed.post.ForumPost;
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 import com.yoloo.android.backend.model.user.Account;
 import com.yoloo.android.backend.model.vote.Vote;
 
@@ -18,7 +18,7 @@ import static com.yoloo.android.backend.service.OfyHelper.ofy;
 public class VoteHelper {
 
     public static ImmutableList<LoadResult<Key<Vote>>> loadAsyncVoteKeys(Key<Account> userKey,
-                                                                         Key<? extends Post> postKey) {
+                                                                         Key<? extends AbstractPost> postKey) {
         LoadResult<Key<Vote>> upVoteKey = ofy().load().type(Vote.class)
                 .ancestor(userKey).filter("postKey =", postKey)
                 .filter("status =", Vote.Status.UP)
@@ -36,7 +36,7 @@ public class VoteHelper {
     }
 
     public static void aggregateVotes(Collection<ForumPost> posts,
-                                      Map<Key<? extends Post>, List<LoadResult<Key<Vote>>>> votedKeysMap) {
+                                      Map<Key<? extends AbstractPost>, List<LoadResult<Key<Vote>>>> votedKeysMap) {
         for (ForumPost post : posts) {
             List<LoadResult<Key<Vote>>> loadResults = votedKeysMap.get(post.getKey());
 
@@ -68,7 +68,7 @@ public class VoteHelper {
         post.setDowns(downVotes);
     }
 
-    private static long getVoteCount(Key<? extends Post> postKey, Vote.Status status) {
+    private static long getVoteCount(Key<? extends AbstractPost> postKey, Vote.Status status) {
         return ofy().load().type(Vote.class)
                 .filter("postKey =", postKey)
                 .filter("status =", status)

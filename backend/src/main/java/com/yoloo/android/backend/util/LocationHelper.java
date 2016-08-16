@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import com.googlecode.objectify.Key;
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.location.LocationInfo;
 
@@ -242,17 +242,17 @@ public final class LocationHelper {
     }
 
     public static List<Location> getLocationList(String locationArgs,
-                                                 Key<? extends Post> postKey) {
+                                                 Key<? extends AbstractPost> postKey) {
         return ImmutableList.copyOf(getLocationsList(locationArgs, postKey));
     }
 
     public static Set<Location> getLocationSet(String locationArgs,
-                                               Key<? extends Post> postKey) {
+                                               Key<? extends AbstractPost> postKey) {
         return ImmutableSet.copyOf(getLocationsList(locationArgs, postKey));
     }
 
     private static List<Location> getLocationsList(String locationArgs,
-                                                   Key<? extends Post> postKey) {
+                                                   Key<? extends AbstractPost> postKey) {
         List<String> locationParts = StringUtil.splitValueByToken(locationArgs, ";");
         List<Location> locations = new ArrayList<>(3);
         for (String part : locationParts) {

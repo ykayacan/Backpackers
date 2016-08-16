@@ -23,7 +23,7 @@ import java.util.Date;
 @Entity
 @Cache
 @JsonPropertyOrder({"id", "ownerId", "username", "profileImageUrl", "comment",
-        "liked", "likeCount", "createdAt"})
+        "liked", "likes", "createdAt"})
 public class Comment implements Likeable {
 
     @Id
@@ -53,7 +53,7 @@ public class Comment implements Likeable {
     private boolean isLiked = false;
 
     @Ignore
-    private long likeCount = 0L;
+    private long likes = 0L;
 
     private Comment() {
     }
@@ -100,12 +100,12 @@ public class Comment implements Likeable {
         return createdAt;
     }
 
-    public long getLikeCount() {
-        return likeCount;
+    public long getLikes() {
+        return likes;
     }
 
-    public void setLikeCount(long likeCount) {
-        this.likeCount = likeCount;
+    public void setLikes(long likes) {
+        this.likes = likes;
     }
 
     public String getProfileImageUrl() {
@@ -122,6 +122,22 @@ public class Comment implements Likeable {
 
     public void setLiked(boolean liked) {
         isLiked = liked;
+    }
+
+    @Override
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public Key<? extends Likeable> getLikeableKey() {
+        return getKey();
+    }
+
+    @Override
+    public void setEntityLiked(boolean liked) {
+        this.setLiked(liked);
+    }
+
+    @Override
+    public void setEntityLikes(long count) {
+        this.setLikes(count);
     }
 
     public static final class Builder {

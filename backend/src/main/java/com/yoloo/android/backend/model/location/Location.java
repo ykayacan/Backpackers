@@ -9,7 +9,7 @@ import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 
 @Entity
 @Cache
@@ -21,7 +21,7 @@ public class Location {
 
     @Index
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    private Key<? extends Post> postKey;
+    private Key<? extends AbstractPost> postKey;
 
     @Index
     private String name;
@@ -69,11 +69,11 @@ public class Location {
     }
 
     public static final class Builder {
-        private Key<? extends Post> postKey;
+        private Key<? extends AbstractPost> postKey;
         private String name;
         private GeoPt geoPt;
 
-        public Builder setPostKey(Key<? extends Post> postKey) {
+        public Builder setPostKey(Key<? extends AbstractPost> postKey) {
             this.postKey = postKey;
             return this;
         }

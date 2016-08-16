@@ -9,12 +9,12 @@ import com.google.common.collect.ImmutableList;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.LoadResult;
 import com.googlecode.objectify.cmd.Query;
+import com.yoloo.android.backend.factory.post.NormalPostFactory;
 import com.yoloo.android.backend.factory.post.PostFactory;
-import com.yoloo.android.backend.factory.post.TimelinePostFactory;
 import com.yoloo.android.backend.model.comment.Comment;
 import com.yoloo.android.backend.model.feed.TimelineFeed;
-import com.yoloo.android.backend.model.feed.post.Post;
-import com.yoloo.android.backend.model.feed.post.TimelinePost;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
+import com.yoloo.android.backend.model.feed.post.NormalPost;
 import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.like.Like;
 import com.yoloo.android.backend.model.user.Account;
@@ -62,7 +62,7 @@ public class TimelineController extends PostController {
      * @param user     the user
      * @return the timeline post
      */
-    public Post add(final String content,
+    public AbstractPost add(final String content,
                     final String hashtags,
                     final String location,
                     final String mediaIds,
@@ -77,14 +77,14 @@ public class TimelineController extends PostController {
         final Account account = ofy().load().key(userKey).now();
 
         // Allocate an id with parent user key.
-        final Key<? extends Post> postKey =
-                ofy().factory().allocateId(userKey, TimelinePost.class);
+        final Key<NormalPost> postKey =
+                ofy().factory().allocateId(userKey, NormalPost.class);
 
         // TODO: 27.07.2016 Get all media links related to media ids.
 
         // Create a new post.
-        final TimelinePost post = (TimelinePost) PostFactory.getPost(
-                new TimelinePostFactory(postKey, account, content, hashtags, location));
+        final NormalPost post = (NormalPost) PostFactory.getPost(
+                new NormalPostFactory(postKey, account, content, hashtags, location));
 
         // Add current post to user's feed.
         final TimelineFeed feed =
@@ -114,19 +114,20 @@ public class TimelineController extends PostController {
      * @param user          the user
      * @return the timeline post
      */
-    public Post update(final String websafePostId,
+    public AbstractPost update(final String websafePostId,
                        final String content,
                        final String hashtags,
                        final String location,
                        final String mediaIds,
                        final HttpServletRequest request,
                        final User user) {
-        final Key<TimelinePost> postKey = Key.create(websafePostId);
+        final Key<NormalPost> postKey = Key.create(websafePostId);
         final Key<Account> userKey = Key.create(user.getUserId());
 
-        TimelinePost post = ofy().load().key(postKey).now();
+        NormalPost post = ofy().load().key(postKey).now();
 
-        final LoadResult<Key<Like>> asyncLikesResult = LikeHelper.loadAsyncLikes(userKey, postKey);
+        final LoadResult<Key<Like>> asyncLikesResult =
+                LikeHelper.loadAsyncPostLikes(userKey, postKey);
         final LoadResult<Key<Comment>> asyncCommentsResult =
                 CommentHelper.loadAsyncComments(userKey, postKey);
 
@@ -137,7 +138,7 @@ public class TimelineController extends PostController {
         updateLocations(post, location);
         updateDate(post);
 
-        LikeHelper.aggregateLikes(post, asyncLikesResult);
+        LikeHelper.aggregateLike(post, asyncLikesResult);
         CommentHelper.aggregateComments(post, asyncCommentsResult);
 
         ofy().save().entities(ImmutableList.builder()
@@ -160,10 +161,10 @@ public class TimelineController extends PostController {
         RemoveTimelineServlet.create(websafePostId);
     }
 
-    public CollectionResponse<Post> list(final String websafeUserId,
-                                         final String cursor,
-                                         Integer limit,
-                                         final User user) {
+    public CollectionResponse<AbstractPost> list(final String websafeUserId,
+                                                 final String cursor,
+                                                 Integer limit,
+                                                 final User user) {
 
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
 
@@ -181,26 +182,28 @@ public class TimelineController extends PostController {
         final QueryResultIterator<TimelineFeed> queryIterator = query.iterator();
 
         // Store async batch in a hashmap. LinkedHashMap preserve insertion order.
-        final Map<Key<Post>, LoadResult<Key<Like>>> likeKeysMap = new LinkedHashMap<>(limit);
-        final Map<Key<? extends Post>, LoadResult<Key<Comment>>> commentKeysMap =
+        final Map<Key<AbstractPost>, LoadResult<Key<Like>>> likeKeysMap =
+                new LinkedHashMap<>(limit);
+        final Map<Key<? extends AbstractPost>, LoadResult<Key<Comment>>> commentKeysMap =
                 new LinkedHashMap<>(limit);
 
         while (queryIterator.hasNext()) {
             // Get post key.
-            final Key<Post> postKey = queryIterator.next().getPostKey();
+            final Key<AbstractPost> postKey = queryIterator.next().getPostKey();
 
-            likeKeysMap.put(postKey, LikeHelper.loadAsyncLikes(userKey, postKey));
+            likeKeysMap.put(postKey, LikeHelper.loadAsyncPostLikes(userKey, postKey));
             commentKeysMap.put(postKey, CommentHelper.loadAsyncComments(userKey, postKey));
         }
 
         // Batch load all post keys for timeline.
-        final Collection<Post> posts = ofy().load().keys(likeKeysMap.keySet()).values();
+        final Collection<AbstractPost> abstractPosts =
+                ofy().load().keys(likeKeysMap.keySet()).values();
 
-        LikeHelper.aggregateLikes(posts, likeKeysMap);
-        CommentHelper.aggregateComments(posts, commentKeysMap);
+        LikeHelper.aggregatePostLikes(abstractPosts, likeKeysMap);
+        CommentHelper.aggregateComments(abstractPosts, commentKeysMap);
 
-        return CollectionResponse.<Post>builder()
-                .setItems(posts)
+        return CollectionResponse.<AbstractPost>builder()
+                .setItems(abstractPosts)
                 .setNextPageToken(queryIterator.getCursor().toWebSafeString())
                 .build();
     }

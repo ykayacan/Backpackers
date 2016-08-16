@@ -14,8 +14,8 @@ import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
 import com.yoloo.android.backend.authenticator.GoogleAuthenticator;
 import com.yoloo.android.backend.authenticator.YolooAuthenticator;
 import com.yoloo.android.backend.controller.TimelineController;
-import com.yoloo.android.backend.model.feed.post.Post;
-import com.yoloo.android.backend.model.feed.post.TimelinePost;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
+import com.yoloo.android.backend.model.feed.post.NormalPost;
 import com.yoloo.android.backend.validator.Validator;
 import com.yoloo.android.backend.validator.rule.common.AllowedToOperate;
 import com.yoloo.android.backend.validator.rule.common.AuthenticationRule;
@@ -59,7 +59,7 @@ public class PostEndpoint {
             Logger.getLogger(PostEndpoint.class.getSimpleName());
 
     /**
-     * Returns the {@link TimelinePost} with the corresponding ID.
+     * Returns the {@link NormalPost} with the corresponding ID.
      *
      * @param websafePostId the ID of the entity to be retrieved
      * @return the entity with the corresponding ID
@@ -69,8 +69,8 @@ public class PostEndpoint {
             name = "posts.get",
             path = "posts/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Post get(@Named("id") final String websafePostId,
-                    final User user)
+    public AbstractPost get(@Named("id") final String websafePostId,
+                            final User user)
             throws ServiceException {
 
         Validator.builder()
@@ -83,18 +83,18 @@ public class PostEndpoint {
     }
 
     /**
-     * Inserts a new {@link TimelinePost}.
+     * Inserts a new {@link NormalPost}.
      */
     @ApiMethod(
             name = "posts.add",
             path = "posts",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public Post add(@Named("content") final String content,
-                    @Named("hashtags") final String hashtags,
-                    @Named("location") final String location,
-                    @Nullable @Named("mediaIds") final String mediaIds,
-                    final HttpServletRequest request,
-                    final User user)
+    public AbstractPost add(@Named("content") final String content,
+                            @Named("hashtags") final String hashtags,
+                            @Named("location") final String location,
+                            @Nullable @Named("mediaIds") final String mediaIds,
+                            final HttpServletRequest request,
+                            final User user)
             throws ServiceException {
 
         // TODO: 31.07.2016 Improve validation.
@@ -119,13 +119,13 @@ public class PostEndpoint {
             name = "posts.update",
             path = "posts/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Post update(@Named("id") final String websafePostId,
-                       @Nullable @Named("content") final String content,
-                       @Nullable @Named("hashtags") final String hashtags,
-                       @Nullable @Named("location") final String location,
-                       @Nullable @Named("mediaIds") final String mediaIds,
-                       final HttpServletRequest request,
-                       final User user)
+    public AbstractPost update(@Named("id") final String websafePostId,
+                               @Nullable @Named("content") final String content,
+                               @Nullable @Named("hashtags") final String hashtags,
+                               @Nullable @Named("location") final String location,
+                               @Nullable @Named("mediaIds") final String mediaIds,
+                               final HttpServletRequest request,
+                               final User user)
             throws ServiceException {
 
         Validator.builder()
@@ -176,11 +176,11 @@ public class PostEndpoint {
             name = "posts.list",
             path = "posts",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Post> list(@Nullable @Named("userId") final String websafeUserId,
-                                         @Nullable @Named("cursor") final String cursor,
-                                         @Nullable @Named("limit") Integer limit,
-                                         final HttpServletRequest request,
-                                         final User user)
+    public CollectionResponse<AbstractPost> list(@Nullable @Named("userId") final String websafeUserId,
+                                                 @Nullable @Named("cursor") final String cursor,
+                                                 @Nullable @Named("limit") Integer limit,
+                                                 final HttpServletRequest request,
+                                                 final User user)
             throws ServiceException {
 
         // TODO: 31.07.2016 Improve validation.

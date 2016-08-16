@@ -8,7 +8,7 @@ import com.yoloo.android.backend.model.Token;
 import com.yoloo.android.backend.model.comment.Comment;
 import com.yoloo.android.backend.model.feed.TimelineFeed;
 import com.yoloo.android.backend.model.feed.post.ForumPost;
-import com.yoloo.android.backend.model.feed.post.TimelinePost;
+import com.yoloo.android.backend.model.feed.post.NormalPost;
 import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.like.Like;
 import com.yoloo.android.backend.model.location.Location;
@@ -38,7 +38,7 @@ public class OfyHelper {
         factory().register(Vote.class);
         factory().register(Like.class);
         factory().register(ForumPost.class);
-        factory().register(TimelinePost.class);
+        factory().register(NormalPost.class);
         factory().register(TimelineFeed.class);
     }
 

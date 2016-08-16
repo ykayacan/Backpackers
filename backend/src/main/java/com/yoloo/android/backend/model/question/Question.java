@@ -15,7 +15,6 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.condition.IfNotDefault;
-import com.yoloo.android.backend.model.like.Likeable;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
 
@@ -28,7 +27,7 @@ import java.util.Set;
 @Cache
 @JsonPropertyOrder({"id", "title", "content", "hashtags", "liked", "location",
         "likesCount", "commentsCount", "createdAt", "updatedAt"})
-public class Question implements Likeable {
+public class Question {
 
     @Id
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)

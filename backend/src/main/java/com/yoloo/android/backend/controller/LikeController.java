@@ -35,7 +35,7 @@ public class LikeController {
 
     public void like() {
         final Key<Account> userKey = Key.create(user.getUserId());
-        final Key<? extends Likeable> likeableKey = Key.create(websafeEntityKey);
+        final Key<Likeable> likeableKey = Key.create(websafeEntityKey);
 
         ofy().transact(new VoidWork() {
             @Override
@@ -49,7 +49,7 @@ public class LikeController {
 
     public void dislike() {
         final Key<Account> userKey = Key.create(user.getUserId());
-        final Key<? extends Likeable> likeableKey = Key.create(websafeEntityKey);
+        final Key<Likeable> likeableKey = Key.create(websafeEntityKey);
 
         ofy().transact(new VoidWork() {
             @Override

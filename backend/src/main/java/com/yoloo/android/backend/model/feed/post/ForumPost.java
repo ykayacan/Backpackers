@@ -7,7 +7,6 @@ import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonPropert
 import com.google.common.collect.Sets;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Ignore;
@@ -30,9 +29,9 @@ import java.util.Set;
 @Cache
 @JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "type", "content",
         "hashtags", "locations", "commented", "status", "ups", "downs", "comments",
-        "reports", "reportedBy", "awardedBy", "awardRep", "locked", "accepted",
+        "reports", "reportedBy", "awardedByWebsafeId", "awardRep", "locked", "accepted",
         "createdAt", "updatedAt"})
-public class ForumPost extends Post implements Commentable {
+public class ForumPost extends AbstractPost implements Commentable {
 
     private boolean isLocked = false;
 
@@ -47,7 +46,7 @@ public class ForumPost extends Post implements Commentable {
 
     @Load
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    private Ref<Account> awardedBy;
+    private String awardedByWebsafeId;
 
     private int awardRep = 0;
 
@@ -92,8 +91,7 @@ public class ForumPost extends Post implements Commentable {
         this.videoUrl = builder.videoUrl;
         this.hashtags = builder.hashtags;
         this.locations = builder.locations;
-        this.awardedBy = builder.awardedBy;
-        this.awardRep = builder.awardRep;
+        this.awardedByWebsafeId = builder.awardedByWebsafeId;
         this.updatedAt = new Date();
     }
 
@@ -161,12 +159,12 @@ public class ForumPost extends Post implements Commentable {
     }
 
     @JsonProperty("awardedBy")
-    public String getAwardedBy() {
-        return awardedBy.getKey().toWebSafeString();
+    public String getAwardedByWebsafeId() {
+        return awardedByWebsafeId;
     }
 
-    public void setAwardedBy(Key<Account> awardedByKey) {
-        this.awardedBy = Ref.create(awardedByKey);
+    public void setAwardedByWebsafeId(Key<Account> awardedByKey) {
+        this.awardedByWebsafeId = awardedByKey.toWebSafeString();
     }
 
     public int getAwardRep() {
@@ -249,12 +247,12 @@ public class ForumPost extends Post implements Commentable {
         this.reports = reports;
     }
 
-    public static abstract class Builder<T extends ForumPost> extends Post.Builder<T> {
+    public static abstract class Builder<T extends ForumPost> extends AbstractPost.Builder<T> {
         private boolean isLocked = false;
         private String videoUrl;
         private Set<String> hashtags;
         private Set<Location> locations;
-        private Ref<Account> awardedBy;
+        private String awardedByWebsafeId;
         private Integer awardRep;
 
         public Builder<T> setLocked(Boolean locked) {
@@ -289,9 +287,12 @@ public class ForumPost extends Post implements Commentable {
         }
 
         public Builder<T> setAward(Key<Account> awardedBy, Integer awardRep) {
-            if (awardRep != null) {
-                this.awardedBy = Ref.create(awardedBy);
+            if (awardRep != null && awardRep != 0) {
+                this.awardedByWebsafeId = awardedBy.toWebSafeString();
                 this.awardRep = awardRep;
+            } else {
+                this.awardRep = 0;
+                this.awardedByWebsafeId = null;
             }
             return this;
         }

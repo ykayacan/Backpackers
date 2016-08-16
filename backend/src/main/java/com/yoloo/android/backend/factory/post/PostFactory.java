@@ -1,10 +1,10 @@
 package com.yoloo.android.backend.factory.post;
 
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 
 public class PostFactory {
 
-    public static Post getPost(PostAbstractFactory factory) {
+    public static AbstractPost getPost(PostAbstractFactory factory) {
         return factory.create();
     }
 }

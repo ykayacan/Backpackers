@@ -6,7 +6,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 
 import com.googlecode.objectify.Key;
 import com.yoloo.android.backend.model.feed.TimelineFeed;
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.user.Account;
 
@@ -44,14 +44,18 @@ public class CreateTimelineServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        processRequest(req, resp);
+    }
+
+    private void processRequest(HttpServletRequest req, HttpServletResponse resp) {
         final String websafeUserId = req.getParameter(WEBSAFE_USER_ID);
         final String websafePostId = req.getParameter(WEBSAFE_POST_ID);
         final String createdAt = req.getParameter(CREATED_AT);
 
         final Key<Account> userKey = Key.create(websafeUserId);
-        final Key<? extends Post> postKey = Key.create(websafePostId);
+        final Key<AbstractPost> postKey = Key.create(websafePostId);
 
         // Get current user's follower keys.
         final List<Key<Account>> followerKeys = getFollowerKeys(userKey);
@@ -66,12 +70,6 @@ public class CreateTimelineServlet extends HttpServlet {
         }
 
         ofy().save().entities(feeds);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        doGet(req, resp);
     }
 
     private List<Key<Account>> getFollowerKeys(Key<Account> userKey) {

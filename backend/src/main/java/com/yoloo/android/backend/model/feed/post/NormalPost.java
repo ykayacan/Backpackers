@@ -13,7 +13,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.condition.IfNotDefault;
-import com.yoloo.android.backend.model.comment.Commentable;
+import com.yoloo.android.backend.model.like.Likeable;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
 
@@ -27,7 +27,7 @@ import java.util.Set;
 @JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "type", "content",
         "hashtags", "locations", "commented", "liked", "likes", "comments",
         "reports", "reportedBy", "createdAt", "updatedAt"})
-public class TimelinePost extends Post implements Commentable {
+public class NormalPost extends AbstractPost implements Likeable {
 
     @Index
     private Set<String> hashtags;
@@ -43,14 +43,16 @@ public class TimelinePost extends Post implements Commentable {
 
     // Extra fields
 
+    // Extra fields
+
     @Ignore
     private boolean isLiked = false;
 
     @Ignore
-    private boolean isCommented = false;
+    private long likes = 0L;
 
     @Ignore
-    private long likes = 0L;
+    private boolean isCommented = false;
 
     @Ignore
     private long comments = 0L;
@@ -60,10 +62,10 @@ public class TimelinePost extends Post implements Commentable {
 
     // Methods
 
-    private TimelinePost() {
+    private NormalPost() {
     }
 
-    private TimelinePost(Builder<?> builder) {
+    private NormalPost(Builder<?> builder) {
         super(builder);
         this.videoUrl = builder.videoUrl;
         this.hashtags = builder.hashtags;
@@ -72,10 +74,10 @@ public class TimelinePost extends Post implements Commentable {
     }
 
     public static Builder<?> builder() {
-        return new Builder<TimelinePost>() {
+        return new Builder<NormalPost>() {
             @Override
-            public TimelinePost build() {
-                return new TimelinePost(this);
+            public NormalPost build() {
+                return new NormalPost(this);
             }
         };
     }
@@ -118,22 +120,6 @@ public class TimelinePost extends Post implements Commentable {
         this.videoUrl = Strings.isNullOrEmpty(videoUrl) ? null : new Link(videoUrl);
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public boolean isLiked() {
-        return isLiked;
-    }
-
-    public void setLiked(boolean liked) {
-        isLiked = liked;
-    }
-
     public boolean isCommented() {
         return isCommented;
     }
@@ -150,12 +136,12 @@ public class TimelinePost extends Post implements Commentable {
         this.locations = locations;
     }
 
-    public long getLikes() {
-        return likes;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setLikes(long likes) {
-        this.likes = likes;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public long getComments() {
@@ -174,7 +160,39 @@ public class TimelinePost extends Post implements Commentable {
         this.reports = reports;
     }
 
-    public static abstract class Builder<T extends TimelinePost> extends Post.Builder<T> {
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public long getLikes() {
+        return likes;
+    }
+
+    public void setLikes(long likes) {
+        this.likes = likes;
+    }
+
+    @Override
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public Key<? extends Likeable> getLikeableKey() {
+        return Key.create(parentUserKey, NormalPost.class, id);
+    }
+
+    @Override
+    public void setEntityLiked(boolean liked) {
+        this.setLiked(liked);
+    }
+
+    @Override
+    public void setEntityLikes(long count) {
+        this.setLikes(count);
+    }
+
+    public static abstract class Builder<T extends NormalPost> extends AbstractPost.Builder<T> {
         private Link videoUrl;
         private Set<String> hashtags;
         private Set<Location> locations;

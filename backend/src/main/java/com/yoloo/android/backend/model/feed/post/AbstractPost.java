@@ -12,7 +12,6 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 import com.yoloo.android.backend.model.Image;
-import com.yoloo.android.backend.model.like.Likeable;
 import com.yoloo.android.backend.model.user.Account;
 
 import java.util.Date;
@@ -21,7 +20,7 @@ import java.util.List;
 /**
  * The base class for Feed entity.
  */
-public class Post implements Likeable {
+public class AbstractPost {
 
     /**
      * The Id.
@@ -70,10 +69,10 @@ public class Post implements Likeable {
 
     // Methods
 
-    Post() {
+    AbstractPost() {
     }
 
-    Post(Builder<?> builder) {
+    AbstractPost(Builder<?> builder) {
         this.id = builder.id;
         this.parentUserKey = builder.parentUserKey;
         this.profileImageUrl = builder.profileImageUrl;
@@ -84,16 +83,16 @@ public class Post implements Likeable {
     }
 
     public static Builder<?> builder() {
-        return new Builder<Post>() {
+        return new Builder<AbstractPost>() {
             @Override
-            public Post build() {
-                return new Post(this);
+            public AbstractPost build() {
+                return new AbstractPost(this);
             }
         };
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public Key<? extends Post> getKey() {
+    public Key<? extends AbstractPost> getKey() {
         return Key.create(parentUserKey, this.getClass(), id);
     }
 
@@ -165,7 +164,7 @@ public class Post implements Likeable {
         return type;
     }
 
-    public static abstract class Builder<T extends Post> {
+    public static abstract class Builder<T extends AbstractPost> {
         protected long id;
         protected Key<Account> parentUserKey;
         protected Link profileImageUrl;

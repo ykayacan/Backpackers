@@ -13,7 +13,7 @@ import com.yoloo.android.backend.factory.post.ForumPostFactory;
 import com.yoloo.android.backend.factory.post.PostFactory;
 import com.yoloo.android.backend.model.comment.Comment;
 import com.yoloo.android.backend.model.feed.post.ForumPost;
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 import com.yoloo.android.backend.model.follow.Follow;
 import com.yoloo.android.backend.model.location.Location;
 import com.yoloo.android.backend.model.user.Account;
@@ -82,7 +82,7 @@ public class ForumController extends PostController {
         final Account account = ofy().load().key(userKey).now();
 
         // Allocate an id with parent user key.
-        final Key<? extends Post> postKey =
+        final Key<ForumPost> postKey =
                 ofy().factory().allocateId(userKey, ForumPost.class);
 
         // Create a new post.
@@ -209,16 +209,16 @@ public class ForumController extends PostController {
         final QueryResultIterator<ForumPost> queryIterator = query.iterator();
 
         // Store async batch in a hashmap. LinkedHashMap preserve insertion order.
-        final Map<Key<? extends Post>, List<LoadResult<Key<Vote>>>> votedKeysMap =
+        final Map<Key<? extends AbstractPost>, List<LoadResult<Key<Vote>>>> votedKeysMap =
                 new LinkedHashMap<>(limit);
-        final Map<Key<? extends Post>, LoadResult<Key<Comment>>> commentKeysMap =
+        final Map<Key<? extends AbstractPost>, LoadResult<Key<Comment>>> commentKeysMap =
                 new LinkedHashMap<>(limit);
 
         final List<ForumPost> posts = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             // Get post key.
             final ForumPost post = queryIterator.next();
-            final Key<? extends Post> postKey = post.getKey();
+            final Key<? extends AbstractPost> postKey = post.getKey();
             posts.add(post);
 
             votedKeysMap.put(postKey, VoteHelper.loadAsyncVoteKeys(userKey, postKey));

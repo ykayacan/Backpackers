@@ -2,9 +2,9 @@ package com.yoloo.android.backend.util;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.LoadResult;
-import com.yoloo.android.backend.model.feed.post.AdsPost;
-import com.yoloo.android.backend.model.feed.post.Post;
-import com.yoloo.android.backend.model.feed.post.TimelinePost;
+import com.yoloo.android.backend.model.comment.Comment;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
+import com.yoloo.android.backend.model.feed.post.ForumPost;
 import com.yoloo.android.backend.model.like.Like;
 import com.yoloo.android.backend.model.like.Likeable;
 import com.yoloo.android.backend.model.user.Account;
@@ -20,43 +20,53 @@ public class LikeHelper {
         return ofy().load().type(Like.class).ancestor(userKey).keys().list().size();
     }
 
-    public static LoadResult<Key<Like>> loadAsyncLikes(Key<Account> userKey,
-                                                       Key<? extends Likeable> likeableKey) {
+    public static LoadResult<Key<Like>> loadAsyncPostLikes(Key<Account> userKey,
+                                                           Key<? extends AbstractPost> postKey) {
         // Async load
         return ofy().load().type(Like.class).ancestor(userKey)
-                .filter("likeableEntityKey =", likeableKey)
+                .filter("likeableEntityKey =", postKey)
                 .keys().first();
     }
 
-    public static void aggregateLikes(Collection<Post> posts,
-                                      Map<Key<Post>, LoadResult<Key<Like>>> map) {
-        for (Post post : posts) {
-            Key<? extends Post> postKey = post.getKey();
-            // The key is always covariant.
-            @SuppressWarnings("SuspiciousMethodCalls")
-            LoadResult<Key<Like>> result = map.get(postKey);
-
-            aggregateLikes(post, result);
-        }
+    public static LoadResult<Key<Like>> loadAsyncCommentLikes(Key<Account> userKey,
+                                                              Key<Comment> commentKey) {
+        // Async load
+        return ofy().load().type(Like.class).ancestor(userKey)
+                .filter("likeableEntityKey =", commentKey)
+                .keys().first();
     }
 
-    public static void aggregateLikes(Post post, LoadResult<Key<Like>> result) {
-        if (post instanceof TimelinePost) {
-            if (result.now() != null) {
-                ((TimelinePost) post).setLiked(true);
-            }
+    public static void aggregatePostLikes(Collection<AbstractPost> posts,
+                                          Map<Key<AbstractPost>, LoadResult<Key<Like>>> map) {
+        for (AbstractPost post : posts) {
+            if (!(post instanceof ForumPost)) {
+                Key<? extends Likeable> entityKey = ((Likeable) post).getLikeableKey();
+                // The key is always covariant.
+                @SuppressWarnings("SuspiciousMethodCalls")
+                final LoadResult<Key<Like>> result = map.get(entityKey);
 
-            ((TimelinePost) post).setLikes(getLikeCount(post.getKey()));
-        } else if (post instanceof AdsPost) {
-            if (result.now() != null) {
-
+                aggregateLike((Likeable) post, result);
             }
         }
     }
 
-    private static long getLikeCount(Key<? extends Post> postKey) {
+    public static void aggregateCommentLikes(Collection<Comment> comments,
+                                             Map<Key<Comment>, LoadResult<Key<Like>>> map) {
+        for (Comment comment : comments) {
+            LoadResult<Key<Like>> result = map.get(comment.getKey());
+
+            aggregateLike(comment, result);
+        }
+    }
+
+    public static void aggregateLike(Likeable likeable, LoadResult<Key<Like>> result) {
+        likeable.setEntityLiked(result.now() != null);
+        likeable.setEntityLikes(getLikeCount(likeable.getLikeableKey()));
+    }
+
+    private static long getLikeCount(Key<? extends Likeable> likeableKey) {
         return ofy().load().type(Like.class)
-                .filter("likeableEntityKey =", postKey)
+                .filter("likeableEntityKey =", likeableKey)
                 .keys().list().size();
     }
 }

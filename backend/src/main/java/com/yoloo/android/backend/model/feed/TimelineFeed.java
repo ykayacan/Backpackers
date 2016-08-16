@@ -6,7 +6,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
-import com.yoloo.android.backend.model.feed.post.Post;
+import com.yoloo.android.backend.model.feed.post.AbstractPost;
 import com.yoloo.android.backend.model.user.Account;
 
 import java.util.Date;
@@ -22,7 +22,7 @@ public class TimelineFeed {
     private Key<Account> parentUserKey;
 
     @Index
-    private Key<? extends Post> postKey;
+    private Key<? extends AbstractPost> postKey;
 
     @Index
     private Date createdAt;
@@ -31,7 +31,7 @@ public class TimelineFeed {
     }
 
     private TimelineFeed(Key<Account> parentUserKey,
-                         Key<? extends Post> postKey,
+                         Key<? extends AbstractPost> postKey,
                          Date createdAt) {
         this.parentUserKey = parentUserKey;
         this.postKey = postKey;
@@ -40,13 +40,13 @@ public class TimelineFeed {
 
     public static TimelineFeed newInstance(
             final Key<Account> parentUserKey,
-            final Key<? extends Post> postKey,
+            final Key<? extends AbstractPost> postKey,
             final Date createdAt) {
         return new TimelineFeed(parentUserKey, postKey, createdAt);
     }
 
-    public Key<Post> getPostKey() {
-        return (Key<Post>) postKey;
+    public Key<AbstractPost> getPostKey() {
+        return (Key<AbstractPost>) postKey;
     }
 
     public Date getCreatedAt() {

@@ -28,6 +28,6 @@ public class NormalPhotoRes extends MediaObject {
 
     @Override
     public String getUrl() {
-        return setupUrl(true, SIZE);
+        return setupUrl(false, SIZE);
     }
 }
