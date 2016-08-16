@@ -29,7 +29,7 @@ import java.util.Set;
 @Cache
 @JsonPropertyOrder({"id", "ownerId", "profileImageUrl", "username", "type", "content",
         "hashtags", "locations", "commented", "status", "ups", "downs", "comments",
-        "reports", "reportedBy", "awardedByWebsafeId", "awardRep", "locked", "accepted",
+        "reports", "reportedBy", "awardedBy", "awardRep", "locked", "accepted",
         "createdAt", "updatedAt"})
 public class ForumPost extends AbstractPost implements Commentable {
 
