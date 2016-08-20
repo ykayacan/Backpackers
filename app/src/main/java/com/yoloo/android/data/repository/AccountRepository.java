@@ -1,39 +1,30 @@
 package com.yoloo.android.data.repository;
 
-import com.yoloo.android.data.model.AccountModel;
-import com.yoloo.android.data.repository.specification.Specification;
-
-import java.util.List;
+import com.yoloo.android.backend.modal.yolooApi.model.Account;
+import com.yoloo.android.data.repository.remote.UserService;
 
 import rx.Observable;
 
-public class AccountRepository implements Repository<AccountModel> {
+public class AccountRepository {
 
-    public AccountRepository() {
+    private final UserService mService;
+
+    public AccountRepository(UserService service) {
+        mService = service;
     }
 
-    @Override
-    public void create(AccountModel item) {
-
+    public Observable<Account> add(final String username,
+                                   final String email,
+                                   final String password) {
+        return mService.createYolooAccount(username, email, password);
     }
 
-    @Override
-    public void update(AccountModel item) {
-
-    }
-
-    @Override
-    public void delete(AccountModel item) {
-
-    }
-
-    @Override
-    public void delete(Specification specification) {
-
-    }
-
-    @Override
-    public Observable<List<AccountModel>> query(final Specification specification) {
-        return null;
+    public Observable<Account> add(final String token,
+                                   final String provider) {
+        if (provider.equals("google")) {
+            return mService.createGoogleAccount(token);
+        } else {
+            return mService.createFacebookAccount(token);
+        }
     }
 }

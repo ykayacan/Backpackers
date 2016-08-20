@@ -2,9 +2,7 @@ package com.yoloo.android.backend.controller;
 
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.response.BadRequestException;
-import com.google.api.server.spi.response.ConflictException;
 import com.google.appengine.api.datastore.Email;
-
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
 import com.yoloo.android.backend.Constants;
@@ -21,6 +19,10 @@ import java.util.Date;
 import static com.yoloo.android.backend.service.OfyHelper.ofy;
 
 public class TokenController {
+
+    public static TokenController newInstance() {
+        return new TokenController();
+    }
 
     public static Token getTokenByAccessToken(String accessToken) {
         return ofy().load().type(Token.class)
@@ -43,7 +45,7 @@ public class TokenController {
         final Account account = getAccountByEmail(username);
 
         if (account == null) {
-            throw new BadRequestException("Invalid username");
+            throw new BadRequestException("Invalid email");
         }
 
         if (!account.isValidPassword(password)) {
@@ -51,8 +53,8 @@ public class TokenController {
         }
 
         if (isTokenExists(account)) {
-            throw new ConflictException("Already found token. " +
-                    "Please use grant_type='refresh_token' instead.");
+            return ofy().load().type(Token.class).ancestor(account)
+                    .first().now();
         }
 
         final Token token = Token.builder(account.getKey())

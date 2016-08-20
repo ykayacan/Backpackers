@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootViewCL"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.yoloo.android.ui.signin.SignInActivity">
+
+    <ImageView
+        android:id="@+id/loginBgIV"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/login_bg_80"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/loginLogoIV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        app:layout_constraintDimensionRatio="4:3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/loginBgIV"
+        app:srcCompat="@drawable/logo_white"
+        tools:ignore="ContentDescription" />
+
+    <Button
+        android:id="@+id/loginFacebookSignInBtn"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="Facebook login"
+        app:layout_constraintBottom_toTopOf="@+id/loginGoogleSignInBtn"
+        app:layout_constraintLeft_toLeftOf="@+id/loginBgIV"
+        app:layout_constraintRight_toRightOf="@+id/loginBgIV" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/loginGoogleSignInBtn"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.56" />
+
+    <TextView
+        android:id="@+id/loginOrTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/login_or_text"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="@+id/loginBgIV"
+        app:layout_constraintRight_toRightOf="@+id/loginBgIV"
+        app:layout_constraintTop_toBottomOf="@+id/loginGoogleSignInBtn" />
+
+    <Button
+        android:id="@+id/loginYolooSignInBtn"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:text="@string/action_sign_in"
+        android:theme="@style/Widget.Yoloo.SignInButton"
+        app:layout_constraintBaseline_toBaselineOf="@+id/loginYolooSignUpBtn"
+        app:layout_constraintLeft_toLeftOf="@+id/loginGoogleSignInBtn" />
+
+    <Button
+        android:id="@+id/loginYolooSignUpBtn"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/action_sign_up"
+        app:layout_constraintRight_toRightOf="@+id/loginGoogleSignInBtn"
+        app:layout_constraintTop_toBottomOf="@+id/loginOrTV" />
+
+</android.support.constraint.ConstraintLayout>

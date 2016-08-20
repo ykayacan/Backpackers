@@ -1,5 +1,6 @@
 package com.yoloo.android.backend.controller;
 
+import com.google.api.server.spi.response.ConflictException;
 import com.google.appengine.api.users.User;
 import com.google.appengine.repackaged.com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
@@ -43,7 +44,7 @@ public class UserController {
 
     /**
      * Add shards for parentUserKey.
-     *
+     * <p>
      * First, it looks for {@link UserIndexShardCounter}.
      * If it exists, then increse value by given value. If not creates a new instance.
      *
@@ -95,15 +96,33 @@ public class UserController {
      * @param payload the payload
      * @return the account
      */
-    public Account add(final GoogleIdToken.Payload payload) {
-        // Allocate a new Id.
-        final Key<Account> userKey = ofy().factory().allocateId(Account.class);
+    public Account add(final GoogleIdToken.Payload payload) throws ConflictException {
+        final String email = payload.getEmail();
 
-        final Account account = UserFactory.getAccount(new GoogleUserFactory(userKey, payload));
+        Key<Account> userKey = ofy().load().type(Account.class)
+                .filter("email =", email)
+                .keys().first().now();
 
-        final UserCounterShard shard = UserCounterShard.builder(1, userKey).build();
+        final Account account;
 
-        return save(account, shard);
+        // User already used Google login before, so return existing user.
+        if (userKey != null) {
+            account = ofy().load().key(userKey).now();
+            if (account.getProvider().compareTo(Account.Provider.GOOGLE) == 0) {
+                return account;
+            } else {
+                throw new ConflictException("Email already exists.");
+            }
+        } else {
+            // Allocate a new Id.
+            final Key<Account> newUserKey = ofy().factory().allocateId(Account.class);
+
+            account = UserFactory.getAccount(new GoogleUserFactory(newUserKey, payload));
+
+            final UserCounterShard shard = UserCounterShard.builder(1, newUserKey).build();
+
+            return save(account, shard);
+        }
     }
 
     /**

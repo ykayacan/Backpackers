@@ -59,7 +59,6 @@ public class Account {
      * The provider.
      */
     @Index
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     private Provider provider;
 
     /**
@@ -146,6 +145,10 @@ public class Account {
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = new Link(profileImageUrl);
+    }
+
+    public Provider getProvider() {
+        return provider;
     }
 
     public long getFolloweeCount() {

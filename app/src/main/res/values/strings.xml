@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Yoloo</string>
+
+    <string name="title_activity_sign_up">Kaydol</string>
+    <string name="title_activity_sign_in">Giriş Yap</string>
+
     <string name="action_settings">Settings</string>
 
     <string name="permission_read_storage_rationale">Storage read permission is needed to pick files.</string>
@@ -9,4 +13,30 @@
     <string name="toast_cannot_retrieve_selected_image">Cannot retrieve selected image</string>
     <string name="toast_cannot_retrieve_cropped_image">Cannot retrieve cropped image</string>
     <string name="toast_unexpected_error">Unexpected error</string>
+
+    <!-- Strings related to sign in -->
+    <string name="login_or_text">veya</string>
+
+
+    <!-- Strings related to sign up -->
+    <string name="prompt_email">E-posta</string>
+    <string name="prompt_username">Kullanıcı adı</string>
+    <string name="prompt_password">Şifre</string>
+    <string name="info_tos">Giriş yaparak hizmet şartlarını kabul etmiş olursunuz.</string>
+
+    <!-- Actions -->
+    <string name="action_sign_up">Kaydol</string>
+    <string name="action_sign_up_short">Kaydol</string>
+    <string name="action_sign_in">Giriş Yap</string>
+
+    <!-- Errors -->
+    <string name="error_invalid_email">Geçersiz e-posta</string>
+    <string name="error_invalid_password">Şifre en az 4 haneli olmalıdır.</string>
+    <string name="error_incorrect_password">Şifre geçersiz</string>
+    <string name="error_field_required">Gerekli alan</string>
+    <string name="error_email_already_taken">E-posta kullanılıyor.</string>
+    <string name="error_username_already_taken">Kullanıcı adı kullanılıyor.</string>
+    <string name="error_credentials">Kullanıcı bulunamadı.</string>
+    <string name="error_network_not_found">İnternet bağlantısı yok.</string>
+
 </resources>

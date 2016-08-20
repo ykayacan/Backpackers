@@ -69,7 +69,7 @@ public class FollowEndpoint {
      * Inserts a new {@code Follow}.
      */
     @ApiMethod(
-            name = "follow",
+            name = "follows.follow",
             path = "users/{user_id}/follows",
             httpMethod = ApiMethod.HttpMethod.POST)
     public void follow(@Named("user_id") final String followeeId, final User user)
@@ -93,7 +93,7 @@ public class FollowEndpoint {
      *                           {@code Follow}
      */
     @ApiMethod(
-            name = "unfollow",
+            name = "follows.unfollow",
             path = "users/{user_id}/follows",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void unfollow(@Named("user_id") final String followeeId, final User user)

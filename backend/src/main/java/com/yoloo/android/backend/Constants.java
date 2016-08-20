@@ -11,12 +11,12 @@ public final class Constants {
     /**
      * Google Cloud Messaging API key.
      */
-    public static final String GCM_API_KEY = "AIzaSyCectOS_wSvb9rIsnLMfJH9F25yXrIfrJo";
+    public static final String GCM_API_KEY = "AIzaSyDqGcTP9mcuHrX7VSn_11tWbXrTdtWeqGg";
 
     /**
      * Android client ID from Google Cloud console.
      */
-    public static final String ANDROID_CLIENT_ID = "156968448687-2nqm11mo5b99jfaimqboltte4h1dd94o.apps.googleusercontent.com";
+    public static final String ANDROID_CLIENT_ID = "156968448687-atvdsb76mka0mliomknefrbcdt6bui1d.apps.googleusercontent.com";
 
     /**
      * iOS client ID from Google Cloud console.
@@ -26,9 +26,9 @@ public final class Constants {
     /**
      * Web client ID from Google Cloud console.
      */
-    public static final String WEB_CLIENT_ID = "156968448687-8pamascp1u8kht9qrhonuq47kndst6k8.apps.googleusercontent.com";
+    public static final String WEB_CLIENT_ID = "156968448687-neijssaop32197nfeuvs52hlo4aqtas4.apps.googleusercontent.com";
 
-    public static final String BASE64_CLIENT_ID = "MTU2OTY4NDQ4Njg3LThwYW1hc2NwMXU4a2h0OXFyaG9udXE0N2tuZHN0Nms4LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t";
+    public static final String BASE64_CLIENT_ID = "MTU2OTY4NDQ4Njg3LW5laWpzc2FvcDMyMTk3bmZldXZzNTJobG80YXF0YXM0LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t";
 
     /**
      * Audience ID used to limit access to some client to the API.

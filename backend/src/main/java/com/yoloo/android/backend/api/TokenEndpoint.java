@@ -50,7 +50,7 @@ public class TokenEndpoint {
 
     @ApiMethod(
             name = "oauth2.token",
-            path = "aouth2/token",
+            path = "oauth2/token",
             httpMethod = ApiMethod.HttpMethod.POST)
     public Token token(final HttpServletRequest request,
                        @Named("grant_type") final String grantType,
@@ -67,17 +67,17 @@ public class TokenEndpoint {
                 .validate();
 
         if (grantType.equals(GrantType.PASSWORD.toString())) {
-            return new TokenController().processGrantTypePassword(username, password);
+            return TokenController.newInstance().processGrantTypePassword(username, password);
         } else if (grantType.equals(GrantType.REFRESH_TOKEN.toString())) {
-            return new TokenController().processGrantTypeRefreshToken(refreshToken);
+            return TokenController.newInstance().processGrantTypeRefreshToken(refreshToken);
         }
 
         return null;
     }
 
     @ApiMethod(
-            name = "aouth2.revoke",
-            path = "aouth2/revoke",
+            name = "oauth2.revoke",
+            path = "oauth2/revoke",
             httpMethod = ApiMethod.HttpMethod.POST)
     public void revokeToken(final HttpServletRequest request)
             throws ServiceException {

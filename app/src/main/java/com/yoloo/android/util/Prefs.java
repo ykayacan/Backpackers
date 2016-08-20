@@ -12,14 +12,27 @@ import java.util.Set;
  * @author Evgeny Shishkin
  */
 public class Prefs {
-    public static final String DEFAULT = "Prefs";
 
     private static Prefs singleton = null;
 
-    final SharedPreferences mPreferences;
+    private final SharedPreferences mPreferences;
 
-    private Prefs(Context context) {
-        mPreferences = context.getSharedPreferences(DEFAULT, Context.MODE_PRIVATE);
+    private Prefs(Builder builder) {
+        mPreferences = builder.mContext.getSharedPreferences(builder.mName, Context.MODE_PRIVATE);
+    }
+
+    /**
+     * The global default {@link Prefs} instance.
+     */
+    public static Prefs with(Context context, String name) {
+        if (singleton == null) {
+            synchronized (Prefs.class) {
+                if (singleton == null) {
+                    singleton = new Builder(context, name).build();
+                }
+            }
+        }
+        return singleton;
     }
 
     /**
@@ -162,37 +175,25 @@ public class Prefs {
     }
 
     /**
-     * The global default {@link Prefs} instance.
-     */
-    public static Prefs with(Context context) {
-        if (singleton == null) {
-            synchronized (Prefs.class) {
-                if (singleton == null) {
-                    singleton = new Builder(context).build();
-                }
-            }
-        }
-        return singleton;
-    }
-
-    /**
      * Fluent API for creating {@link Prefs} instances.
      */
     private static class Builder {
         private final Context mContext;
+        private final String mName;
 
-        Builder(Context context) {
+        Builder(Context context, String name) {
             if (context == null) {
                 throw new IllegalArgumentException("Context must not be null.");
             }
             mContext = context.getApplicationContext();
+            mName = name;
         }
 
         /**
          * Create the {@link Prefs} instance.
          */
         public Prefs build() {
-            return new Prefs(mContext);
+            return new Prefs(this);
         }
     }
 
