@@ -114,7 +114,7 @@
         android:layout_height="wrap_content"
         android:background="#f3f3f3"
         android:padding="32dp"
-        android:text="@string/info_tos"
+        android:text="@string/label_TOS"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

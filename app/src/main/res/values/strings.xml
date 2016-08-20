@@ -1,33 +1,28 @@
 <resources>
     <string name="app_name">Yoloo</string>
 
+    <!-- Activity titles -->
     <string name="title_activity_sign_up">Kaydol</string>
     <string name="title_activity_sign_in">Giriş Yap</string>
 
-    <string name="action_settings">Settings</string>
-
+    <!-- Permissions -->
     <string name="permission_read_storage_rationale">Storage read permission is needed to pick files.</string>
 
+    <!-- Labels -->
     <string name="label_select_picture">Select Picture</string>
+    <string name="label_or">veya</string>
+    <string name="label_TOS">Giriş yaparak hizmet şartlarını kabul etmiş olursunuz.</string>
 
-    <string name="toast_cannot_retrieve_selected_image">Cannot retrieve selected image</string>
-    <string name="toast_cannot_retrieve_cropped_image">Cannot retrieve cropped image</string>
-    <string name="toast_unexpected_error">Unexpected error</string>
-
-    <!-- Strings related to sign in -->
-    <string name="login_or_text">veya</string>
-
-
-    <!-- Strings related to sign up -->
+    <!-- Prompts -->
     <string name="prompt_email">E-posta</string>
     <string name="prompt_username">Kullanıcı adı</string>
     <string name="prompt_password">Şifre</string>
-    <string name="info_tos">Giriş yaparak hizmet şartlarını kabul etmiş olursunuz.</string>
 
     <!-- Actions -->
     <string name="action_sign_up">Kaydol</string>
     <string name="action_sign_up_short">Kaydol</string>
     <string name="action_sign_in">Giriş Yap</string>
+    <string name="action_settings">Settings</string>
 
     <!-- Errors -->
     <string name="error_invalid_email">Geçersiz e-posta</string>
@@ -38,5 +33,10 @@
     <string name="error_username_already_taken">Kullanıcı adı kullanılıyor.</string>
     <string name="error_credentials">Kullanıcı bulunamadı.</string>
     <string name="error_network_not_found">İnternet bağlantısı yok.</string>
+
+    <!-- Library -->
+    <string name="toast_cannot_retrieve_selected_image">Cannot retrieve selected image</string>
+    <string name="toast_cannot_retrieve_cropped_image">Cannot retrieve cropped image</string>
+    <string name="toast_unexpected_error">Unexpected error</string>
 
 </resources>

@@ -3,7 +3,7 @@ package com.yoloo.android.data.repository.remote;
 import com.google.api.client.http.HttpHeaders;
 import com.yoloo.android.Constants;
 import com.yoloo.android.backend.modal.yolooApi.model.Token;
-import com.yoloo.android.data.ServerHelper;
+import com.yoloo.android.util.ServerHelper;
 
 import java.util.concurrent.Callable;
 

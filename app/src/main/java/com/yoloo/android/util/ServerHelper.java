@@ -1,4 +1,4 @@
-package com.yoloo.android.data;
+package com.yoloo.android.util;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -33,17 +33,6 @@ public final class ServerHelper {
                         }
                     })
                     .setApplicationName("Yoloo")
-                    .build();
-        }
-        return sYolooApi;
-    }
-
-    public static YolooApi getYolooApi(String token) {
-        if (sYolooApi == null) {  // Only do this once
-            sYolooApi = new YolooApi.Builder(
-                    AndroidHttp.newCompatibleTransport(),
-                    new AndroidJsonFactory(), null)
-                    .setRootUrl(Constants.API_BASEURL)
                     .build();
         }
         return sYolooApi;

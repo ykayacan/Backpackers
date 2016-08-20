@@ -3,7 +3,7 @@ package com.yoloo.android.data.repository.remote;
 import android.util.Base64;
 
 import com.yoloo.android.backend.modal.yolooApi.model.Account;
-import com.yoloo.android.data.ServerHelper;
+import com.yoloo.android.util.ServerHelper;
 
 import java.util.concurrent.Callable;
 
