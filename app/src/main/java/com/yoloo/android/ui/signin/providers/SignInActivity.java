@@ -1,4 +1,4 @@
-package com.yoloo.android.ui.signin;
+package com.yoloo.android.ui.signin.providers;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,31 +17,34 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.hannesdorfmann.mosby.mvp.MvpActivity;
 import com.yoloo.android.BuildConfig;
 import com.yoloo.android.R;
 import com.yoloo.android.backend.modal.yolooApi.model.Account;
+import com.yoloo.android.backend.modal.yolooApi.model.Token;
 import com.yoloo.android.data.repository.AccountRepository;
 import com.yoloo.android.data.repository.remote.UserService;
+import com.yoloo.android.framework.base.BaseMvpActivity;
+import com.yoloo.android.ui.home.HomeActivity;
+import com.yoloo.android.ui.signin.AuthView;
 import com.yoloo.android.ui.signin.yoloo.YolooSignInActivity;
 import com.yoloo.android.ui.signup.YolooSignUpActivity;
 import com.yoloo.android.util.NetworknUtil;
-import com.yoloo.android.util.Prefs;
+import com.yoloo.android.util.PrefHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class SignInActivity extends MvpActivity<SignInView, SignInPresenter> implements
-        SignInView, GoogleApiClient.OnConnectionFailedListener {
+public class SignInActivity extends BaseMvpActivity<AuthView, SignInPresenter> implements
+        AuthView, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int RC_GOOGLE_SIGN_IN = 9001;
 
     @BindView(R.id.loginGoogleSignInBtn)
     SignInButton mSignInButton;
 
-    @BindView(R.id.rootViewCL)
+    @BindView(R.id.root_main)
     ConstraintLayout mRootView;
 
     private GoogleApiClient mGoogleApiClient;
@@ -85,14 +88,8 @@ public class SignInActivity extends MvpActivity<SignInView, SignInPresenter> imp
     }
 
     @Override
-    public void onNavigateToHome() {
-        Timber.d("Navigating to home.");
-    }
-
-    @Override
     public void onSaveUser(Account account) {
-        Prefs.with(this, "user")
-                .edit()
+        PrefHelper.with(this).edit()
                 .putString("id", account.getId())
                 .putString("email", account.getEmail())
                 .putString("usename", account.getUsername())
@@ -102,7 +99,20 @@ public class SignInActivity extends MvpActivity<SignInView, SignInPresenter> imp
     }
 
     @Override
-    public void onEmailExistsError() {
+    public void onSaveToken(Token token) {
+        PrefHelper.with(this).edit()
+                .putString("accessToken", token.getAccessToken())
+                .apply();
+    }
+
+    @Override
+    public void onSuccess() {
+        startActivity(new Intent(this, HomeActivity.class));
+        finish();
+    }
+
+    @Override
+    public void onError(Throwable e) {
         Snackbar.make(mRootView, R.string.error_email_already_taken, Snackbar.LENGTH_SHORT)
                 .show();
     }

@@ -16,21 +16,18 @@ public class YolooAuthenticator implements Authenticator {
     public User authenticate(HttpServletRequest request) {
         final String authzHeader = request.getHeader(OAuth.HeaderType.AUTHORIZATION);
 
-        if (Strings.isNullOrEmpty(authzHeader)) {
+        if (Strings.isNullOrEmpty(authzHeader) ||
+                !authzHeader.contains(OAuth.OAUTH_HEADER_NAME)) {
             return null;
         }
 
-        if (authzHeader.contains(OAuth.OAUTH_HEADER_NAME)) {
-            final String accessToken = authzHeader.substring(6).trim();
+        final String accessToken = authzHeader.substring(6).trim();
 
-            Token token = TokenController.getTokenByAccessToken(accessToken);
-            if (token == null || token.isTokenExpired()) {
-                return null;
-            }
-
-            return new User(token.getKey().getParent().toWebSafeString(), "");
+        Token token = TokenController.getTokenByAccessToken(accessToken);
+        if (token == null || token.isTokenExpired()) {
+            return null;
         }
 
-        return null;
+        return new User(token.getKey().getParent().toWebSafeString(), "");
     }
 }

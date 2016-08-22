@@ -11,6 +11,11 @@
         <item name="android:statusBarColor">@android:color/black</item>
     </style>
 
+    <style name="Yoloo.Home">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
     <style name="Widget.Yoloo.SignInButton" parent="Widget.AppCompat.Button.Colored">
         <item name="android:colorButtonNormal">@android:color/white</item>
         <item name="android:textColor">?attr/colorPrimary</item>

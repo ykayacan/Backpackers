@@ -2,6 +2,7 @@ package com.yoloo.android.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.util.Map;
 import java.util.Set;
@@ -11,24 +12,24 @@ import java.util.Set;
  *
  * @author Evgeny Shishkin
  */
-public class Prefs {
+public class PrefHelper {
 
-    private static Prefs singleton = null;
+    private static PrefHelper singleton = null;
 
     private final SharedPreferences mPreferences;
 
-    private Prefs(Builder builder) {
-        mPreferences = builder.mContext.getSharedPreferences(builder.mName, Context.MODE_PRIVATE);
+    private PrefHelper(Builder builder) {
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(builder.mContext);
     }
 
     /**
-     * The global default {@link Prefs} instance.
+     * The global default {@link PrefHelper} instance.
      */
-    public static Prefs with(Context context, String name) {
+    public static PrefHelper with(Context context) {
         if (singleton == null) {
-            synchronized (Prefs.class) {
+            synchronized (PrefHelper.class) {
                 if (singleton == null) {
-                    singleton = new Builder(context, name).build();
+                    singleton = new Builder(context).build();
                 }
             }
         }
@@ -175,25 +176,23 @@ public class Prefs {
     }
 
     /**
-     * Fluent API for creating {@link Prefs} instances.
+     * Fluent API for creating {@link PrefHelper} instances.
      */
     private static class Builder {
         private final Context mContext;
-        private final String mName;
 
-        Builder(Context context, String name) {
+        Builder(Context context) {
             if (context == null) {
                 throw new IllegalArgumentException("Context must not be null.");
             }
             mContext = context.getApplicationContext();
-            mName = name;
         }
 
         /**
-         * Create the {@link Prefs} instance.
+         * Create the {@link PrefHelper} instance.
          */
-        public Prefs build() {
-            return new Prefs(this);
+        public PrefHelper build() {
+            return new PrefHelper(this);
         }
     }
 

@@ -8,7 +8,6 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.users.User;
-
 import com.yoloo.android.backend.Constants;
 import com.yoloo.android.backend.authenticator.FacebookAuthenticator;
 import com.yoloo.android.backend.authenticator.GoogleAuthenticator;

@@ -23,33 +23,36 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.signin.SignInActivity"
+            android:name=".ui.signin.providers.SignInActivity"
             android:label="@string/app_name"
-            android:theme="@style/Yoloo.SignIn">
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.SignIn" />
+        <activity
+            android:name=".ui.signin.yoloo.YolooSignInActivity"
+            android:label="@string/title_activity_sign_in"
+            android:parentActivityName=".ui.signin.providers.SignInActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.YolooSignIn" />
+        <activity
+            android:name=".ui.signup.YolooSignUpActivity"
+            android:label="@string/title_activity_sign_up"
+            android:parentActivityName=".ui.signin.providers.SignInActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.YolooSignUp" />
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.Home">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.signup.YolooSignUpActivity"
-            android:label="@string/title_activity_sign_up"
-            android:parentActivityName=".ui.signin.SignInActivity"
-            android:theme="@style/Yoloo.YolooSignUp" />
-
-        <activity
-            android:name=".ui.signin.yoloo.YolooSignInActivity"
-            android:label="@string/title_activity_sign_in"
-            android:parentActivityName=".ui.signin.SignInActivity"
-            android:theme="@style/Yoloo.YolooSignIn" />
-
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-
     </application>
 
 </manifest>

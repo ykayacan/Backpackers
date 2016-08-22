@@ -150,17 +150,7 @@ public class AbstractPost {
     }
 
     public String getType() {
-        switch (getClass().getSimpleName()) {
-            case "TimelinePost":
-                type = "post";
-                break;
-            case "AdsPost":
-                type = "ads";
-                break;
-            case "ForumPost":
-                type = "question";
-                break;
-        }
+        type = getClass().getSimpleName().replace("Post", "").toLowerCase();
         return type;
     }
 

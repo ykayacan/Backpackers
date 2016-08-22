@@ -5,7 +5,6 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.users.User;
 import com.google.common.collect.ImmutableList;
-
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.LoadResult;
 import com.googlecode.objectify.cmd.Query;
@@ -63,11 +62,11 @@ public class TimelineController extends PostController {
      * @return the timeline post
      */
     public AbstractPost add(final String content,
-                    final String hashtags,
-                    final String location,
-                    final String mediaIds,
-                    final HttpServletRequest request,
-                    final User user) {
+                            final String hashtags,
+                            final String location,
+                            final String mediaIds,
+                            final HttpServletRequest request,
+                            final User user) {
         // Create parent user key.
         final Key<Account> userKey = Key.create(user.getUserId());
         final LoadResult<Key<Follow>> followResult = ofy().load().type(Follow.class)
@@ -115,12 +114,12 @@ public class TimelineController extends PostController {
      * @return the timeline post
      */
     public AbstractPost update(final String websafePostId,
-                       final String content,
-                       final String hashtags,
-                       final String location,
-                       final String mediaIds,
-                       final HttpServletRequest request,
-                       final User user) {
+                               final String content,
+                               final String hashtags,
+                               final String location,
+                               final String mediaIds,
+                               final HttpServletRequest request,
+                               final User user) {
         final Key<NormalPost> postKey = Key.create(websafePostId);
         final Key<Account> userKey = Key.create(user.getUserId());
 

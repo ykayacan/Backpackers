@@ -1,26 +1,26 @@
 package com.yoloo.android.framework;
 
-import com.yoloo.android.framework.base.BasePresenter;
-
 import android.content.Context;
 import android.support.v4.content.Loader;
 
-public class PresenterLoader<P extends BasePresenter> extends Loader<P> {
+import com.yoloo.android.framework.base.MvpPresenter;
+
+import timber.log.Timber;
+
+public class PresenterLoader<P extends MvpPresenter> extends Loader<P> {
+
+    private final PresenterFactory<P> mFactory;
     private P mPresenter;
 
-    private String mTagPresenter;
-
-    public PresenterLoader(Context context, String tagPresenter) {
+    public PresenterLoader(Context context, PresenterFactory<P> mFactory) {
         super(context);
-
-        mTagPresenter = tagPresenter;
+        this.mFactory = mFactory;
     }
 
     @Override
     protected void onStartLoading() {
-        super.onStartLoading();
-
         if (mPresenter != null) {
+            Timber.d("onStartLoading(): delivered.");
             deliverResult(mPresenter);
             return;
         }
@@ -30,13 +30,17 @@ public class PresenterLoader<P extends BasePresenter> extends Loader<P> {
 
     @Override
     protected void onForceLoad() {
-        mPresenter = (P) PresenterFactory.getInstance().create(mTagPresenter);
+        mPresenter = mFactory.createPresenter();
+        Timber.d("onForceLoad() - New presenter is created: %s", mPresenter.getClass().getName());
         deliverResult(mPresenter);
     }
 
     @Override
     protected void onReset() {
-        mPresenter.onDestroy();
-        mPresenter = null;
+        if (mPresenter != null) {
+            Timber.d("onReset(): presenter destroyed.");
+            mPresenter.onDestroyed();
+            mPresenter = null;
+        }
     }
 }

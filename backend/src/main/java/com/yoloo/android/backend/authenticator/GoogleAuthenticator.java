@@ -32,13 +32,15 @@ public class GoogleAuthenticator implements Authenticator {
     }
 
     public static GoogleIdToken.Payload processGoogleToken(String idToken) {
+        GoogleIdToken googleIdToken;
         try {
-            GoogleIdToken googleIdToken = getVerifier().verify(idToken);
-            if (googleIdToken != null) {
-                return googleIdToken.getPayload();
-            }
-        } catch (GeneralSecurityException | IOException ignored) {
+            googleIdToken = getVerifier().verify(idToken);
+        } catch (GeneralSecurityException | IOException | IllegalArgumentException e) {
+            return null;
+        }
 
+        if (googleIdToken != null) {
+            return googleIdToken.getPayload();
         }
 
         return null;
@@ -49,11 +51,13 @@ public class GoogleAuthenticator implements Authenticator {
         final String authzHeader = request.getHeader(OAuth.HeaderType.AUTHORIZATION);
 
         if (Strings.isNullOrEmpty(authzHeader) ||
-                authzHeader.contains(OAuth.OAUTH_HEADER_NAME)) {
+                !authzHeader.contains(OAuth.OAUTH_HEADER_NAME)) {
             return null;
         }
 
-        GoogleIdToken.Payload payload = processGoogleToken(authzHeader);
+        final String accessToken = authzHeader.substring(6).trim();
+
+        GoogleIdToken.Payload payload = processGoogleToken(accessToken);
         if (payload == null) {
             return null;
         }

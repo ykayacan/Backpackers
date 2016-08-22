@@ -2,6 +2,7 @@ package com.yoloo.android.ui.signup;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -17,7 +18,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.hannesdorfmann.mosby.mvp.MvpActivity;
 import com.yoloo.android.R;
 import com.yoloo.android.backend.modal.yolooApi.model.Account;
 import com.yoloo.android.backend.modal.yolooApi.model.Token;
@@ -25,16 +25,17 @@ import com.yoloo.android.data.repository.AccountRepository;
 import com.yoloo.android.data.repository.TokenRepository;
 import com.yoloo.android.data.repository.remote.TokenService;
 import com.yoloo.android.data.repository.remote.UserService;
-import com.yoloo.android.util.Prefs;
+import com.yoloo.android.framework.base.BaseMvpActivity;
+import com.yoloo.android.ui.home.HomeActivity;
+import com.yoloo.android.util.PrefHelper;
 
 import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
-public class YolooSignUpActivity extends MvpActivity<YolooSignUpView, YolooSignUpPresenter>
+public class YolooSignUpActivity extends BaseMvpActivity<YolooSignUpView, YolooSignUpPresenter>
         implements YolooSignUpView {
 
     @BindView(R.id.signUpEmailEt)
@@ -55,10 +56,10 @@ public class YolooSignUpActivity extends MvpActivity<YolooSignUpView, YolooSignU
     @BindView(R.id.signUpPasswordTil)
     TextInputLayout mPasswordTil;
 
-    @BindView(R.id.toolbar)
+    @BindView(R.id.toolbar_main)
     Toolbar mToolbar;
 
-    @BindView(R.id.rootViewCL)
+    @BindView(R.id.root_main)
     ConstraintLayout mRootView;
 
     @BindInt(android.R.integer.config_shortAnimTime)
@@ -122,19 +123,13 @@ public class YolooSignUpActivity extends MvpActivity<YolooSignUpView, YolooSignU
     }
 
     @Override
-    public void onShowProgressDialog(boolean show) {
+    public void onShowProgress(boolean show) {
         showProgress(show);
     }
 
     @Override
-    public void onNavigateToHome() {
-        Timber.d("Navigating to home.");
-    }
-
-    @Override
     public void onSaveUser(Account account) {
-        Prefs.with(this, "user")
-                .edit()
+        PrefHelper.with(this).edit()
                 .putString("id", account.getId())
                 .putString("email", account.getEmail())
                 .putString("usename", account.getUsername())
@@ -145,11 +140,21 @@ public class YolooSignUpActivity extends MvpActivity<YolooSignUpView, YolooSignU
 
     @Override
     public void onSaveToken(Token token) {
-        Prefs.with(this, "token")
-                .edit()
+        PrefHelper.with(this).edit()
                 .putString("accessToken", token.getAccessToken())
                 .putString("refreshToken", token.getRefreshToken())
                 .apply();
+    }
+
+    @Override
+    public void onSuccess() {
+        startActivity(new Intent(this, HomeActivity.class));
+        finish();
+    }
+
+    @Override
+    public void onError(Throwable e) {
+
     }
 
     @Override

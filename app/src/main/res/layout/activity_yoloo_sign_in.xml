@@ -1,7 +1,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootViewCL"
+    android:id="@+id/root_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.yoloo.android.ui.signin.yoloo.YolooSignInActivity">
@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbar_main"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -85,16 +85,6 @@
             android:maxLines="1" />
 
     </android.support.design.widget.TextInputLayout>
-
-    <CheckBox
-        android:id="@+id/signInRememberMeCb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="Beni hatırla"
-        app:layout_constraintBaseline_toBaselineOf="@+id/signInBtn"
-        app:layout_constraintLeft_toLeftOf="parent" />
 
     <Button
         android:id="@+id/signInBtn"

@@ -21,6 +21,9 @@
         <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
     </style>
 
+    <style name="Yoloo.Home">
+    </style>
+
     <style name="Theme.Yoloo.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Yoloo.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
@@ -33,5 +36,9 @@
         <item name="android:textColor">@color/error</item>
         <item name="android:textSize">12sp</item>
     </style>
+
+    <style name="Yoloo.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Yoloo.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

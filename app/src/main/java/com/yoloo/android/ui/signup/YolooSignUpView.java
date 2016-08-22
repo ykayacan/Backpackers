@@ -1,18 +1,10 @@
 package com.yoloo.android.ui.signup;
 
-import com.hannesdorfmann.mosby.mvp.MvpView;
-import com.yoloo.android.backend.modal.yolooApi.model.Account;
-import com.yoloo.android.backend.modal.yolooApi.model.Token;
+import com.yoloo.android.ui.signin.AuthView;
 
-interface YolooSignUpView extends MvpView {
+interface YolooSignUpView extends AuthView {
 
-    void onShowProgressDialog(boolean show);
-
-    void onNavigateToHome();
-
-    void onSaveUser(Account account);
-
-    void onSaveToken(Token token);
+    void onShowProgress(boolean show);
 
     void onEmailExistsError();
 

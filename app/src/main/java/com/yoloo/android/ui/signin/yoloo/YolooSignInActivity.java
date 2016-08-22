@@ -2,6 +2,7 @@ package com.yoloo.android.ui.signin.yoloo;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -14,25 +15,25 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.hannesdorfmann.mosby.mvp.MvpActivity;
 import com.yoloo.android.R;
+import com.yoloo.android.backend.modal.yolooApi.model.Account;
 import com.yoloo.android.backend.modal.yolooApi.model.Token;
 import com.yoloo.android.data.repository.TokenRepository;
 import com.yoloo.android.data.repository.remote.TokenService;
-import com.yoloo.android.util.Prefs;
+import com.yoloo.android.framework.base.BaseMvpActivity;
+import com.yoloo.android.ui.home.HomeActivity;
+import com.yoloo.android.util.PrefHelper;
 
 import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
-public class YolooSignInActivity extends MvpActivity<YolooSignInView, YolooSignInPresenter>
+public class YolooSignInActivity extends BaseMvpActivity<YolooSignInView, YolooSignInPresenter>
         implements YolooSignInView {
 
     @BindView(R.id.signInEmailEt)
@@ -47,13 +48,10 @@ public class YolooSignInActivity extends MvpActivity<YolooSignInView, YolooSignI
     @BindView(R.id.signInPasswordTil)
     TextInputLayout mPasswordTil;
 
-    @BindView(R.id.signInRememberMeCb)
-    CheckBox mRememberMeCb;
-
-    @BindView(R.id.toolbar)
+    @BindView(R.id.toolbar_main)
     Toolbar mToolbar;
 
-    @BindView(R.id.rootViewCL)
+    @BindView(R.id.root_main)
     ConstraintLayout mRootView;
 
     @BindInt(android.R.integer.config_shortAnimTime)
@@ -74,8 +72,7 @@ public class YolooSignInActivity extends MvpActivity<YolooSignInView, YolooSignI
         setContentView(R.layout.activity_yoloo_sign_in);
         ButterKnife.bind(this);
 
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolbar();
 
         mPasswordEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -115,27 +112,37 @@ public class YolooSignInActivity extends MvpActivity<YolooSignInView, YolooSignI
     }
 
     @Override
-    public void onShowProgressDialog(boolean show) {
+    public void onShowProgress(boolean show) {
         showProgress(show);
     }
 
     @Override
-    public void onNavigateToHome() {
-        Timber.d("Navigating to home.");
-    }
-
-    @Override
-    public void onSaveToken(Token token) {
-        Prefs.with(this, "token")
-                .edit()
-                .putString("accessToken", token.getAccessToken())
-                .putString("refreshToken", token.getRefreshToken())
-                .putString("rememberMe", String.valueOf(mRememberMeCb.isChecked()))
+    public void onSaveUser(Account account) {
+        PrefHelper.with(this).edit()
+                .putString("id", account.getId())
+                .putString("email", account.getEmail())
+                .putString("usename", account.getUsername())
+                .putString("profileImageUrl", account.getProfileImageUrl())
+                .putString("provider", account.getProvider())
                 .apply();
     }
 
     @Override
-    public void onError() {
+    public void onSaveToken(Token token) {
+        PrefHelper.with(this).edit()
+                .putString("accessToken", token.getAccessToken())
+                .putString("refreshToken", token.getRefreshToken())
+                .apply();
+    }
+
+    @Override
+    public void onSuccess() {
+        startActivity(new Intent(this, HomeActivity.class));
+        finish();
+    }
+
+    @Override
+    public void onError(Throwable e) {
         Snackbar.make(mRootView, R.string.error_credentials, Snackbar.LENGTH_SHORT)
                 .show();
     }
@@ -227,5 +234,10 @@ public class YolooSignInActivity extends MvpActivity<YolooSignInView, YolooSignI
                 }
             }
         });
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }
