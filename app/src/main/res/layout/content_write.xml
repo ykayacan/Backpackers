@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_content_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_write">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="16dp">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.backpackers.android.ui.widget.CircleImageView
+                android:id="@+id/image_avatar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/header_bg" />
+
+            <LinearLayout
+                android:id="@+id/layout_wrapper_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
+                app:layout_constraintLeft_toRightOf="@+id/image_avatar"
+                app:layout_constraintTop_toTopOf="@+id/image_avatar">
+
+                <com.backpackers.android.ui.widget.BaselineGridTextView
+                    android:id="@+id/text_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    tools:text="krialix" />
+
+                <com.backpackers.android.ui.widget.BaselineGridTextView
+                    android:id="@+id/text_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-2dp"
+                    android:layout_marginStart="-2dp"
+                    android:layout_marginTop="2dp"
+                    android:drawableLeft="@drawable/ic_place_grey_18dp"
+                    android:drawableStart="@drawable/ic_place_grey_18dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:visibility="gone"
+                    tools:text="@string/lorem_ipsum"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edit_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/transparent"
+                android:hint="@string/prompt_write"
+                android:inputType="textMultiLine|textCapSentences"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/image_avatar" />
+
+            <HorizontalScrollView
+                android:id="@+id/nested_scroll_media"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:scrollbars="none"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_content">
+
+                <LinearLayout
+                    android:id="@+id/layout_add_media"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:orientation="horizontal" />
+
+            </HorizontalScrollView>
+
+            <HorizontalScrollView
+                android:id="@+id/nested_scroll_hashtags"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:scrollbars="none"
+                android:visibility="gone"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/nested_scroll_media">
+
+                <LinearLayout
+                    android:id="@+id/layout_add_hashtag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:orientation="horizontal" />
+
+            </HorizontalScrollView>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/layout_small_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/layer_top_stroke"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/image_btn_add_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_place_orange_24dp" />
+
+            <ImageButton
+                android:id="@+id/image_btn_add_media"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_add_a_photo_green_24dp" />
+
+            <ImageButton
+                android:id="@+id/image_btn_add_hashtag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_hashtag_24dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_big_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/divider_3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <com.backpackers.android.ui.widget.BaselineGridTextView
+                android:id="@+id/text_add_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:drawableLeft="@drawable/ic_place_orange_24dp_wrapper"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_place_orange_24dp_wrapper"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:text="@string/label_add_location"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Yerini bildir" />
+
+            <View
+                android:id="@+id/divider_2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <com.backpackers.android.ui.widget.BaselineGridTextView
+                android:id="@+id/text_add_media"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:drawableLeft="@drawable/ic_add_a_photo_green_24dp_wrapper"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_add_a_photo_green_24dp_wrapper"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:text="@string/label_add_media"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Fotoğraf / Video ekle" />
+
+            <View
+                android:id="@+id/divider_1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <com.backpackers.android.ui.widget.BaselineGridTextView
+                android:id="@+id/text_add_hashtag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:drawableLeft="@drawable/ic_hashtag_blue_24dp_wrapper"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_hashtag_blue_24dp_wrapper"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:text="@string/label_add_hashtag"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

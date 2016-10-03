@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/background_light"
+    android:foreground="?selectableItemBackground">
+
+    <include layout="@layout/merge_user_info_header_1" />
+
+    <com.backpackers.android.ui.widget.SquaredImageView
+        android:id="@+id/image_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:scaleType="centerCrop"
+        android:transitionName="@string/transition_content_photo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/profile_bg" />
+
+    <com.backpackers.android.ui.widget.ReadMoreTextView
+        android:id="@+id/text_content"
+        style="@style/Widget.Yoloo.Post"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image_content"
+        app:trimLines="10"
+        app:trimMode="trimModeLine"
+        tools:text="@string/lorem_ipsum" />
+
+    <com.luseen.autolinklibrary.AutoLinkTextView
+        android:id="@+id/text_hashTags"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:lineSpacingMultiplier="1.2"
+        android:paddingBottom="2dp"
+        android:paddingTop="4dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_content"
+        tools:text="#irlanda #izlanda #geogia #turkey " />
+
+    <include layout="@layout/merge_user_action_footer_3" />
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,18 @@
+<cronentries>
+    <cron>
+        <url>/admin/buildsearchindex</url>
+        <description>Build full text search index based on the latest data
+        </description>
+        <schedule>every day 5:00</schedule>
+        <timezone>America/New_York</timezone>
+    </cron>
+
+    <cron>
+        <url>/tasks/updaterank</url>
+        <description>Update rank of the post based on the latest data
+        </description>
+        <schedule>every 5 minutes</schedule>
+        <timezone>America/New_York</timezone>
+    </cron>
+
+</cronentries>

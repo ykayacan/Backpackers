@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.yoloo.android.com.backpackers.android.ui.profile.ProfileActivity">
+
+    <com.backpackers.android.ui.widget.RevealBackgroundView
+        android:id="@+id/layout_reveal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:revealColor="@android:color/background_light" />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/layout_content_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/Yoloo.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar_main"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll"
+                app:popupTheme="@style/Yoloo.PopupOverlay" />
+
+            <include layout="@layout/content_profile_user_info" />
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tablayout_main"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabBackground="@android:color/background_light"
+                app:tabGravity="fill"
+                app:tabIndicatorColor="@color/colorAccent" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager_profile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background_lightish"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</FrameLayout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_write"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.yoloo.android.com.backpackers.android.ui.write.WriteActivity">
+
+    <com.backpackers.android.ui.widget.RevealBackgroundView
+        android:id="@+id/layout_reveal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:revealColor="@color/colorAccent" />
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Yoloo.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_main"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/Yoloo.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_write" />
+
+</android.support.design.widget.CoordinatorLayout>

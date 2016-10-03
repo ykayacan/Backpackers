@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.backpackers.android.ui.widget.BaselineGridTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text_hashTag"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:drawableLeft="@drawable/ic_hashtag_black_24dp_wrapper"
+    android:drawablePadding="16dp"
+    android:drawableStart="@drawable/ic_hashtag_black_24dp_wrapper"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:padding="16dp"
+    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+    android:textColor="@android:color/black"
+    tools:text="test" />

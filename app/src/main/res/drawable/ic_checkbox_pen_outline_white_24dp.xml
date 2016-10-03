@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:tint="@color/tab_bg_profile"
+    android:tintMode="src_in"
+    android:viewportHeight="48.827"
+    android:viewportWidth="48.827">
+    <path
+        android:fillColor="#FFF"
+        android:pathData="M48.15,6.05l-4.37,-4.36c-0.45,-0.45 -1.04,-0.68 -1.64,-0.68 -0.59,0 -1.19,0.23 -1.64,0.68L37.02,5.17l7.64,7.63 3.49,-3.48c0.9,-0.9 0.9,-2.37 0,-3.26zM14.34,27.81l7.64,7.63L43.02,14.43l-7.64,-7.63M12.69,29.44l-1.63,9.25 9.27,-1.63" />
+    <path
+        android:fillColor="#FFF"
+        android:pathData="M33.81,42.82H5V14.01h20.33l5.01,-5H3.23C1.45,9.01 0,10.47 0,12.25v32.34c0,1.78 1.46,3.23 3.23,3.23h32.34c1.78,0 3.23,-1.46 3.23,-3.23v-23.12l-5,4.99 0,16.36z" />
+</vector>

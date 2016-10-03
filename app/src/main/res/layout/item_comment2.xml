@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.backpackers.android.ui.widget.CircleImageView
+        android:id="@+id/image_avatar"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/login_bg_80" />
+
+    <com.backpackers.android.ui.widget.BaselineGridTextView
+        android:id="@+id/text_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@+id/image_avatar"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@+id/image_avatar"
+        app:layout_constraintTop_toTopOf="@+id/image_avatar"
+        tools:text="duygu_keskek" />
+
+    <ImageButton
+        android:id="@+id/image_btn_options"
+        style="@style/Widget.AppCompat.ActionButton.Overflow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:tint="@android:color/secondary_text_dark"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_more_vert_black_24dp" />
+
+    <com.backpackers.android.ui.widget.BaselineGridTextView
+        android:id="@+id/text_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_username"
+        android:layout_marginEnd="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_toEndOf="@+id/image_avatar"
+        android:layout_toRightOf="@+id/image_avatar"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintLeft_toRightOf="@+id/image_avatar"
+        app:layout_constraintRight_toLeftOf="@+id/image_btn_options"
+        app:layout_constraintTop_toBottomOf="@+id/text_username"
+        tools:text="@string/lorem_ipsum" />
+
+    <com.backpackers.android.ui.widget.RelativeTimeTextView
+        android:id="@+id/text_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_toEndOf="@id/image_avatar"
+        android:layout_toRightOf="@+id/image_avatar"
+        android:drawableEnd="@drawable/ic_single_dot_black_24dp"
+        android:drawableRight="@drawable/ic_single_dot_black_24dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/text_content"
+        app:layout_constraintTop_toBottomOf="@+id/text_content"
+        app:trim_ago_suffix="true"
+        tools:text="10d" />
+
+    <com.backpackers.android.ui.widget.LikeButton
+        android:id="@+id/btn_like"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_below="@+id/text_content"
+        android:layout_toRightOf="@+id/text_time"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/text_time"
+        app:layout_constraintLeft_toRightOf="@+id/text_time"
+        app:layout_constraintTop_toTopOf="@+id/text_time"
+        app:like_drawable="@drawable/ic_like_full_red_24dp"
+        app:unlike_drawable="@drawable/ic_like_empty_grey_24dp" />
+
+    <TextSwitcher
+        android:id="@+id/ts_likes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_content"
+        android:layout_marginTop="8dp"
+        android:layout_toEndOf="@+id/btn_like"
+        android:layout_toRightOf="@+id/btn_like"
+        android:inAnimation="@anim/slide_in_likes_counter"
+        android:outAnimation="@anim/slide_out_likes_counter"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_like"
+        app:layout_constraintLeft_toRightOf="@+id/btn_like"
+        app:layout_constraintTop_toTopOf="@+id/btn_like">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            tools:text="123" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+    </TextSwitcher>
+
+</RelativeLayout>

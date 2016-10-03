@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background_light"
+    android:foreground="?attr/selectableItemBackground"
+    android:paddingBottom="16dp"
+    android:paddingTop="16dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.backpackers.android.ui.widget.CheckableImageButton
+            android:id="@+id/image_btn_vote_up"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/selector_up_big"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.20"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider_footer" />
+
+        <TextSwitcher
+            android:id="@+id/ts_ups"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:inAnimation="@anim/slide_in_likes_counter"
+            android:outAnimation="@anim/slide_out_likes_counter">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                tools:text="123" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+        </TextSwitcher>
+
+        <com.backpackers.android.ui.widget.VoteButton
+            android:id="@+id/image_btn_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="?selectableItemBackgroundBorderless"
+            app:down_drawable="@drawable/ic_forum_white_32dp"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_forum_white_32dp" />
+
+        <TextView
+            android:id="@+id/text_comments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            tools:text="10" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="56dp"
+        android:layout_marginStart="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.backpackers.android.ui.widget.CircleImageView
+            android:id="@+id/image_avatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            tools:src="@drawable/profile_bg" />
+
+        <com.backpackers.android.ui.widget.BaselineGridTextView
+            android:id="@+id/text_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:ellipsize="marquee"
+            android:maxLength="21"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="demo user" />
+
+        <com.backpackers.android.ui.widget.RelativeTimeTextView
+            android:id="@+id/text_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_single_dot_black_24dp_wrapper"
+            android:drawableStart="@drawable/ic_single_dot_black_24dp_wrapper"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:trim_ago_suffix="true"
+            tools:text="10d" />
+
+    </LinearLayout>
+
+    <com.backpackers.android.ui.widget.ReadMoreTextView
+        android:id="@+id/text_content"
+        style="@style/Widget.Yoloo.Post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_header"
+        android:layout_marginEnd="104dp"
+        android:layout_marginLeft="56dp"
+        android:layout_marginRight="104dp"
+        android:layout_marginStart="56dp"
+        app:trimLines="7"
+        app:trimMode="trimModeLine"
+        tools:text="@string/lorem_ipsum" />
+
+    <ImageView
+        android:id="@+id/image_content"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/layout_header"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:scaleType="centerCrop"
+        android:transitionName="@string/transition_content_photo"
+        tools:src="@drawable/profile_bg" />
+
+    <com.luseen.autolinklibrary.AutoLinkTextView
+        android:id="@+id/text_hashTags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_content"
+        android:layout_marginEnd="104dp"
+        android:layout_marginLeft="56dp"
+        android:layout_marginRight="104dp"
+        android:layout_marginStart="56dp"
+        android:lineSpacingMultiplier="1.2"
+        android:paddingBottom="2dp"
+        android:paddingTop="4dp"
+        tools:text="#irlanda #izlanda #geogia #turkey " />
+
+</RelativeLayout>

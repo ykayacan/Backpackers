@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.backpackers.android.ui.widget.SquaredImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/image_badge_grid"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:scaleType="centerInside"
+    tools:src="@drawable/welcome" />
