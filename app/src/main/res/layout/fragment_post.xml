@@ -1,20 +1,32 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yoloo.android.ui.post.PostFragment">
+    tools:context="com.backpackers.android.ui.timeline.TimelineFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_post"
+        android:id="@+id/swipe_timeline"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview_post"
+            android:id="@+id/list_timeline"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false" />
+            android:clipToPadding="false"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/item_timeline_text" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/text_empty_timeline"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="EMPTY"
+        android:visibility="gone" />
 
 </FrameLayout>

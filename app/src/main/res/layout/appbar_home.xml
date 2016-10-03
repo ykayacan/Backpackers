@@ -5,8 +5,7 @@
     android:id="@+id/root_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.yoloo.android.ui.home.HomeActivity">
+    tools:context="com.backpackers.android.ui.home.HomeActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_main"
@@ -14,14 +13,22 @@
         android:layout_height="wrap_content"
         android:theme="@style/Yoloo.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_main"
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_search"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Yoloo.PopupOverlay">
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            app:cardBackgroundColor="@android:color/white">
 
-        </android.support.v7.widget.Toolbar>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:popupTheme="@style/Yoloo.PopupOverlay"
+                app:titleTextAppearance="@style/TextAppearance.Yoloo.HomeSearchToolbar" />
+
+        </android.support.v7.widget.CardView>
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tablayout_main"
@@ -39,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@drawable/ic_checkbox_pen_outline_white_24dp"
+        app:useCompatPadding="true" />
 
 </android.support.design.widget.CoordinatorLayout>

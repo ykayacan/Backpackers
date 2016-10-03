@@ -1,53 +1,174 @@
 <resources>
-    <string name="app_name">Yoloo</string>
+    <string name="app_name">Backpackers</string>
 
     <!-- Activity titles -->
-    <string name="title_activity_sign_up">Kaydol</string>
-    <string name="title_activity_sign_in">Giriş Yap</string>
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_sign_up">Sign up</string>
+    <string name="title_activity_sign_in">Log in</string>
+    <string name="title_activity_write">Share on Backpackers</string>
+    <string name="title_activity_crop">Edit image</string>
+    <string name="title_activity_location">Choose location</string>
+
+    <string name="title_activity_follow_followers">Followers</string>
+    <string name="title_activity_follow_followees">Following</string>
 
     <!-- Permissions -->
-    <string name="permission_read_storage_rationale">Storage read permission is needed to pick files.</string>
+    <string name="permission_gallery_rationale">Gallery permission</string>
+    <string name="permission_gallery_denied">Gallery permission is denied.</string>
+    <string name="permission_gallery_never_askagain">Galeri için izin vermediniz.</string>
+
+    <string name="permission_camera_rationale">Camera permission</string>
+    <string name="permission_camera_denied">Camera permission is denied.</string>
+    <string name="permission_camera_never_askagain">Kamera için izin vermediniz.</string>
+
+    <string name="permission_location_rationale">Location permission</string>
+    <string name="permission_location_denied">Location permission is denied.</string>
+    <string name="permission_location_never_askagain">Lokasyon için izin vermediniz.</string>
 
     <!-- Labels -->
     <string name="label_select_picture">Select Picture</string>
-    <string name="label_or">veya</string>
-    <string name="label_TOS">Giriş yaparak hizmet şartlarını kabul etmiş olursunuz.</string>
-    <string name="label_search_text">YOLOO\'da Ara</string>
+    <string name="label_or">or</string>
+
+    <string name="label_likes_count">%1$d beğeni</string>
+    <string name="label_comments_count">%1$d yorum</string>
+
+    <string name="label_hashtag">#%1$s </string>
+
+    <string name="label_search_yoloo">Yoloo\' da Ara</string>
+    <string name="label_search_forum">Search questions</string>
+
+    <string name="label_hot">Hot</string>
+    <string name="label_new">Trending</string>
+
+    <string name="label_add_location">Check-in</string>
+    <string name="label_add_media">Photo</string>
+    <string name="label_add_hashtag">Hashtag</string>
+
+    <string name="label_posts">Posts</string>
+    <string name="label_follower">Follower</string>
+    <string name="label_followee">Following</string>
+
+    <string name="label_followed">User is followed.</string>
+    <string name="label_unfollowed">User is not following.</string>
+
+    <string name="label_location_disabled">Location Disabled</string>
+    <string name="label_location_turn_on">Turn On</string>
+
+    <string name="label_follow">Follow</string>
+    <string name="label_unfollow">Unfollow</string>
+
+    <string name="label_action_follow">started following you.</string>
+    <string name="label_action_comment">replied to your question:</string>
+    <string name="label_action_mention">mentioned you in a comment:</string>
 
     <!-- Prompts -->
-    <string name="prompt_email">E-posta</string>
-    <string name="prompt_username">Kullanıcı adı</string>
-    <string name="prompt_password">Şifre</string>
+    <string name="prompt_email">E-mail</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_comment">Yorum yazın…</string>
+    <string name="prompt_write">Ask your question to the great community of travellers !</string>
+    <string name="prompt_search">Search…</string>
+    <string name="prompt_hashtag">hashtag1, hashtag2</string>
 
     <!-- Actions -->
-    <string name="action_sign_up">Kaydol</string>
-    <string name="action_sign_up_short">Kaydol</string>
-    <string name="action_sign_in">Giriş Yap</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="action_sign_up_short">Sign Up</string>
+    <string name="action_sign_in">Log In</string>
+
+    <string name="action_voice">Sesli Arama</string>
+    <string name="action_layout">Change layout</string>
+
+    <string name="action_profile">Profile</string>
+    <string name="action_favorites">Favorites</string>
+    <string name="action_invite_friends">Arkadaşlarını davet et</string>
     <string name="action_settings">Settings</string>
 
+    <string name="action_delete">Delete</string>
+    <string name="action_update">Update</string>
+
+    <string name="action_write">SHARE</string>
+
     <!-- Errors -->
-    <string name="error_invalid_email">Geçersiz e-posta</string>
-    <string name="error_invalid_password">Şifre en az 4 haneli olmalıdır.</string>
-    <string name="error_incorrect_password">Şifre geçersiz</string>
-    <string name="error_field_required">Gerekli alan</string>
-    <string name="error_email_already_taken">E-posta kullanılıyor.</string>
-    <string name="error_username_already_taken">Kullanıcı adı kullanılıyor.</string>
-    <string name="error_credentials">Kullanıcı bulunamadı.</string>
-    <string name="error_network_not_found">İnternet bağlantısı yok.</string>
+    <string name="error_invalid_email">Invalid email</string>
+    <string name="error_invalid_password">Your password must include at least 4 characters</string>
+    <string name="error_field_required">Required field</string>
+    <string name="error_email_already_taken">Email is in use</string>
+    <string name="error_username_already_taken">Username is in use</string>
+    <string name="error_network_not_found">No internet connection</string>
+    <string name="error_user_not_found">User not found</string>
+    <string name="error_user_already_following">User is already following!</string>
+    <string name="error_max_hashtag_limit">Hashtag limit is 5!</string>
 
     <!-- Library -->
-    <string name="toast_cannot_retrieve_selected_image">Cannot retrieve selected image</string>
-    <string name="toast_cannot_retrieve_cropped_image">Cannot retrieve cropped image</string>
-    <string name="toast_unexpected_error">Unexpected error</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Widgets -->
     <string name="just_now">Just Now</string>
+    <string name="read_more">read more</string>
+
+    <!-- API Keys -->
+    <string name="google_android_api_key">AIzaSyCedwGAbX1N22ZQIGgLc7ZL-QPYL22LTus</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="dialog_title_options">Options</string>
+    <string name="dialog_text_content_not_null">You have content!</string>
+    <string name="dialog_title_hashtag">Add Hashtags</string>
+    <string name="dialog_text_hashtag_empty">Hashtags are required.</string>
+    <string name="dialog_text_hashtag_much">Max. hashtags limit is 5.</string>
+    <string name="dialog_title_sign_out">Sign out</string>
+    <string name="dialog_text_sign_out">Do you "really" want to sign out? We will miss you :)</string>
+
+    <string name="notification_title_media_upload">Upload</string>
+    <string name="notification_content_media_uploading">Your image is uploading…</string>
+    <string name="notification_content_media_uploaded">Uploaded</string>
+
+    <string name="notification_follow">\@%1$s started following you.</string>
+    <string name="notification_comment">\@%1$s replied to your question: </string>
+    <string name="notification_vote">\@%1$s voted up your question.</string>
+
+    <string-array name="list_add_location">
+        <item>Delete</item>
+        <item>Edit</item>
+    </string-array>
+    <string-array name="list_add_media">
+        <item>Camera</item>
+        <item>Gallery</item>
+    </string-array>
+
+    <!-- Transitions -->
+    <string name="transition_content_photo">transition_content_image</string>
+    <string name="transition_profile_avatar">transition_profile_avatar</string>
+
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_search_photo">SearchPhotoActivity</string>
+
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Praesent purus purus, pellentesque et elit a, tempus faucibus enim.
+        Curabitur vestibulum pulvinar elit a congue. Sed venenatis at orci at eleifend.</string>
+
+    <!-- Badges -->
+    <string name="badge_title_welcome">Welcome</string>
+    <string name="badge_content_welcome">Tadaa…! Welcome to the Backpacker\'s community !
+        As backpackers, we love to share our experiences here and have fun.
+        So, why are you waiting ? Choose now : ASK or ANSWER ;)</string>
+
+    <string name="badge_title_newbie">Newbie</string>
+    <string name="badge_content_newbie">Don\'t be sad being just a newbie traveler.
+        Everybody starts like this. Show your power to us and you\'ll be surprised !</string>
+
+    <string name="badge_title_first_user">The very first of us</string>
+    <string name="badge_content_first_user">You may ask why the hell did i get this ?
+        Let us explain : you are one of the travelers who joins us in just 30 days.
+        So, here is a backpack for you to start the adventure !</string>
+
+    <string name="badge_title_entrepreneur">Entrepreneur</string>
+    <string name="badge_content_entrepreneur">May the answers be with you !</string>
+
+    <string name="badge_title_wasted">Wasted</string>
+    <string name="badge_content_wasted">Hmm… It seems like you are a little bit hurt but that\'s okey,
+        ask again and give an another chance !</string>
 
 </resources>

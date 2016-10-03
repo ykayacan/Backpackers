@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yoloo.android">
+    package="com.backpackers.android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <permission
         android:name="com.example.gcm.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <application
-        android:name=".App"
+        android:name="com.backpackers.android.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -21,26 +27,21 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_android_api_key" />
+        <meta-data
+            android:name="com.google.android.awareness.API_KEY"
+            android:value="@string/google_android_api_key" />
 
         <activity
-            android:name=".ui.signin.providers.SignInActivity"
-            android:label="@string/app_name"
+            android:name="com.backpackers.android.ui.signin.SignInActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Yoloo.SignIn" />
+            android:theme="@style/Yoloo.SignIn"
+            android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".ui.signin.yoloo.YolooSignInActivity"
-            android:label="@string/title_activity_sign_in"
-            android:parentActivityName=".ui.signin.providers.SignInActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Yoloo.YolooSignIn" />
-        <activity
-            android:name=".ui.signup.YolooSignUpActivity"
-            android:label="@string/title_activity_sign_up"
-            android:parentActivityName=".ui.signin.providers.SignInActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Yoloo.YolooSignUp" />
-        <activity
-            android:name=".ui.home.HomeActivity"
+            android:name="com.backpackers.android.ui.home.HomeActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Yoloo.Home">
             <intent-filter>
@@ -50,9 +51,77 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
+            android:name="com.backpackers.android.ui.comment.CommentActivity"
+            android:parentActivityName="com.backpackers.android.ui.home.HomeActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/Yoloo.Comment"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.backpackers.android.ui.photo.PhotoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.Photo" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.backpackers.android.ui.post_detail.PostDetailActivity"
+            android:parentActivityName="com.backpackers.android.ui.home.HomeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.backpackers.android.ui.write.WriteActivity"
+            android:label="@string/title_activity_write"
+            android:parentActivityName="com.backpackers.android.ui.home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.Write"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.backpackers.android.ui.profile.ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.Profile" />
+        <activity
+            android:name="com.backpackers.android.ui.search.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:parentActivityName="com.backpackers.android.ui.home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.Search" />
+        <activity
+            android:name="com.backpackers.android.ui.location.LocationActivity"
+            android:label="@string/title_activity_location"
+            android:parentActivityName="com.backpackers.android.ui.write.WriteActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Yoloo.Location" />
+        <activity
+            android:name="com.backpackers.android.ui.follow.FollowActivity"
+            android:parentActivityName="com.backpackers.android.ui.profile.ProfileActivity"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name="com.backpackers.android.services.FcmMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.backpackers.android.services.FcmInstanceIdService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.backpackers.android.services.FcmRegistrationIntentService"
+            android:exported="false" />
+
+        <!-- Glide configurations for image loading -->
+        <meta-data
+            android:name="com.backpackers.android.util.glide.GlideConfiguration"
+            android:value="GlideModule" />
+        <meta-data
+            android:name="com.bumptech.glide.integration.okhttp3.OkHttpGlideModule"
+            android:value="GlideModule" />
     </application>
 
 </manifest>

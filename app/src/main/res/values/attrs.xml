@@ -14,22 +14,85 @@
         <attr name="relative_time_prefix" format="string" />
         <attr name="relative_time_suffix" format="string" />
         <attr name="reference_time" format="string" />
+        <attr name="trim_ago_suffix" format="boolean" />
     </declare-styleable>
 
-    <declare-styleable name="BezelImageView">
-        <attr name="maskDrawable" format="reference" />
-        <attr name="borderDrawable" format="reference" />
-        <attr name="desaturateOnPress" format="boolean" />
+    <declare-styleable name="LikeButton">
+        <attr name="icon_type" format="string" />
+        <attr name="icon_size" format="dimension|reference" />
+        <attr name="like_drawable" format="reference" />
+        <attr name="unlike_drawable" format="reference" />
+        <attr name="dots_primary_color" format="color|reference" />
+        <attr name="dots_secondary_color" format="color|reference" />
+        <attr name="circle_start_color" format="color|reference" />
+        <attr name="circle_end_color" format="color|reference" />
+        <attr name="is_liked" format="boolean" />
+        <attr name="is_enabled" format="boolean" />
+        <attr name="anim_scale_factor" format="float" />
     </declare-styleable>
 
-    <declare-styleable name="sparkbutton">
-        <attr name="sparkbutton_iconSize" format="dimension|reference" />
-        <attr name="sparkbutton_activeImage" format="reference" />
-        <attr name="sparkbutton_inActiveImage" format="reference" />
-        <attr name="sparkbutton_primaryColor" format="reference" />
-        <attr name="sparkbutton_secondaryColor" format="reference" />
-        <attr name="sparkbutton_pressOnTouch" format="boolean" />
-        <attr name="sparkbutton_animationSpeed" format="float" />
+    <declare-styleable name="ReadMoreTextView">
+        <attr name="trimExpandedText" format="string" />
+        <attr name="trimCollapsedText" format="string" />
+        <attr name="trimLength" format="integer" />
+        <attr name="showTrimExpandedText" format="boolean" />
+        <attr name="colorClickableText" format="color" />
+        <attr name="trimLines" format="integer" />
+        <attr name="trimMode">
+            <enum name="trimModeLine" value="0" />
+            <enum name="trimModeLength" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="SmileyLoadingView">
+        <!-- animation duration -->
+        <attr name="duration" format="integer" />
+        <!-- stroke width -->
+        <attr name="strokeWidth" format="dimension" />
+        <!-- stroke color -->
+        <attr name="strokeColor" format="color" />
+        <!-- animation repeat count -->
+        <attr name="animRepeatCount" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="VoteButton">
+        <attr name="up_drawable" format="reference" />
+        <attr name="down_drawable" format="reference" />
+    </declare-styleable>
+
+    <attr name="lineHeightHint" format="dimension" />
+
+    <declare-styleable name="BaselineGridTextView">
+        <attr name="lineHeightMultiplierHint" format="float" />
+        <attr name="lineHeightHint" />
+        <attr name="maxLinesByHeight" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="ElasticDragDismissFrameLayout">
+        <attr name="dragDismissDistance" format="dimension" />
+        <attr name="dragDismissFraction" format="float" />
+        <attr name="dragDismissScale" format="float" />
+        <attr name="dragElasticity" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="RevealBackgroundView">
+        <attr name="revealColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="ForegroundView">
+        <attr name="android:foreground" />
+        <attr name="android:foregroundInsidePadding" />
+        <attr name="android:foregroundGravity" />
+    </declare-styleable>
+
+    <declare-styleable name="EllipsizeTextView">
+        <attr name="ellipsize_text" format="string|reference" />
+        <attr name="ellipsize_index" format="integer|reference" />
+        <attr name="ellipsize_colorClickableText" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="CheckableImageButton">
+        <attr name="isChecked" format="boolean"/>
     </declare-styleable>
 
 </resources>

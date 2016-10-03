@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_person_black_24dp"
+            android:title="@string/action_profile" />
+        <!--<item
+            android:id="@+id/nav_favorites"
+            android:icon="@drawable/ic_star_yellow_24dp"
+            android:title="@string/action_favorites" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_multiple_users_silhouette_green_24dp"
+            android:title="@string/action_invite_friends" />-->
+    </group>
+
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/action_settings" />
+    </group>
+
+</menu>

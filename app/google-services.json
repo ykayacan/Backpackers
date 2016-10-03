@@ -1,48 +1,56 @@
 {
   "project_info": {
-    "project_number": "156968448687",
-    "project_id": "yoloo-app"
+    "project_number": "634217538679",
+    "firebase_url": "https://backpackers-app.firebaseio.com",
+    "project_id": "backpackers-app",
+    "storage_bucket": "backpackers-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:156968448687:android:9ba7b4c8da97a4ad",
+        "mobilesdk_app_id": "1:634217538679:android:3a5a7a173a3ccefb",
         "android_client_info": {
-          "package_name": "com.yoloo.android"
+          "package_name": "com.backpackers.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "156968448687-atvdsb76mka0mliomknefrbcdt6bui1d.apps.googleusercontent.com",
+          "client_id": "634217538679-q31nch44a33es8muugf54ecrkch8ha0d.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.yoloo.android",
-            "certificate_hash": "4DF762525E62EC0961403E7929E8689E34E16994"
+            "package_name": "com.backpackers.android",
+            "certificate_hash": "3BDD04E3F33A625FF1BFC32B1E67D4BA42D69413"
           }
         },
         {
-          "client_id": "156968448687-neijssaop32197nfeuvs52hlo4aqtas4.apps.googleusercontent.com",
+          "client_id": "634217538679-r5gbfiqprcj96h0ljrrdc6rvl0kovkh3.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "634217538679-1enrmmsjv7cqhotojlrg31doec51r3rk.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCbkm9KkiDLGPldPgk1XqwO9dX-caLqRNc"
+          "current_key": "AIzaSyCedwGAbX1N22ZQIGgLc7ZL-QPYL22LTus"
         }
       ],
       "services": {
         "analytics_service": {
-          "status": 2,
-          "analytics_property": {
-            "tracking_id": "UA-79257376-1"
-          }
+          "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "634217538679-r5gbfiqprcj96h0ljrrdc6rvl0kovkh3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

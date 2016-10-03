@@ -3,11 +3,14 @@
     <queue>
         <name>create-timeline-queue</name>
         <rate>50/s</rate>
-        <bucket-size>20</bucket-size>
     </queue>
     <queue>
         <name>remove-timeline-queue</name>
         <rate>20/s</rate>
-        <bucket-size>10</bucket-size>
+    </queue>
+    <queue>
+        <name>recommendations-queue</name>
+        <rate>100/s</rate>
+        <bucket-size>100</bucket-size>
     </queue>
 </queue-entries>

@@ -1,0 +1,86 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.backpackers.android.ui.signin.ProviderSignInFragment">
+
+    <ImageView
+        android:id="@+id/image_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/sign_in_bg"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/image_app_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/app_title"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/image_app_slogan"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image_app_title"
+        app:srcCompat="@drawable/app_slogan"
+        tools:ignore="ContentDescription" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/btn_google_sign_in"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.68" />
+
+    <TextView
+        android:id="@+id/text_or"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/label_or"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_google_sign_in" />
+
+    <Button
+        android:id="@+id/btn_yoloo_sign_in"
+        android:layout_width="128dp"
+        android:layout_height="64dp"
+        android:text="@string/action_sign_in"
+        android:theme="@style/Widget.Yoloo.WhiteButton"
+        app:layout_constraintBaseline_toBaselineOf="@+id/btn_yoloo_sign_up"
+        app:layout_constraintLeft_toLeftOf="@+id/btn_google_sign_in" />
+
+    <Button
+        android:id="@+id/btn_yoloo_sign_up"
+        android:layout_width="128dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/action_sign_up"
+        android:theme="@style/Widget.Yoloo.OrangeButton"
+        app:layout_constraintRight_toRightOf="@+id/btn_google_sign_in"
+        app:layout_constraintTop_toBottomOf="@+id/text_or" />
+
+</android.support.constraint.ConstraintLayout>

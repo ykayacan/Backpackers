@@ -1,35 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/side_nav_bar"
+    android:background="@color/scrim_nav_header"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@android:drawable/sym_def_app_icon" />
-
-    <TextView
+        android:id="@+id/image_nav_header_bg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="Android Studio"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:tint="@color/scrim_nav_header"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/header_bg"
+        tools:ignore="ContentDescription"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintTop_creator="1" />
+
+    <com.backpackers.android.ui.widget.CircleImageView
+        android:id="@+id/image_nav_header_avatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        app:civ_border_color="@android:color/white"
+        app:civ_border_width="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/text_nav_header_username"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/image_nav_header_bg"
+        app:layout_constraintVertical_bias="1.0"
+        tools:src="@drawable/header_bg" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/text_avatar_level"
+        style="@style/TextAppearance.AppCompat"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginStart="48dp"
+        android:background="@drawable/circle_level"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/image_nav_header_avatar"
+        app:layout_constraintLeft_toLeftOf="@+id/image_nav_header_avatar"
+        app:layout_constraintTop_toTopOf="@+id/image_nav_header_avatar"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="3" />
+
+    <TextView
+        android:id="@+id/text_nav_header_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="android.studio@android.com" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintBottom_toTopOf="@+id/text_nav_header_email"
+        app:layout_constraintLeft_toLeftOf="@+id/image_nav_header_bg"
+        tools:text="\@user1" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/text_nav_header_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintBottom_toBottomOf="@+id/image_nav_header_bg"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:text="android.studio@android.com" />
+
+</android.support.constraint.ConstraintLayout>

@@ -3,28 +3,34 @@
 
     <!-- app palette -->
     <color name="colorPrimary">#FA8D31</color>
-    <color name="colorPrimaryDark">#c87027</color>
+    <color name="colorPrimaryDark">#e86d06</color>
     <color name="colorAccent">#13C3FF</color>
 
+    <color name="colorPrimaryBlue">@color/colorAccent</color>
+    <color name="colorPrimaryDarkBlue">#009fd5</color>
+
+    <color name="colorPrimaryGreen">#4CAF50</color>
+    <color name="colorPrimaryDarkGreen">#39843c</color>
+
     <!-- common colours -->
-    <color name="text_primary_dark">#de000000</color> <!-- 87% -->
-    <color name="text_secondary_dark">#8a000000</color> <!-- 54% -->
+    <!-- 87% -->
+    <!-- 54% -->
     <color name="text_secondary_light">#b3ffffff</color> <!-- 70% -->
-    <color name="text_disabled_light">#4dffffff</color> <!-- 30% -->
+    <!-- 30% -->
+    <color name="icon_active">#8A000000</color> <!-- 54% -->
     <color name="background_light">#fafafa</color> <!-- grey 50 -->
     <color name="background_lightish">#e0e0e0</color> <!-- grey 300 -->
-    <color name="background_dark">#ff333333</color>
-    <color name="scrim">#99323232</color>
-    <color name="content_placeholder">#ffe0e0e0</color>
-    <color name="dark_icon">#99000000</color> <!-- 60% black-->
-    <color name="dark_icon_half_alpha">#4d000000</color> <!-- 30% black-->
+    <color name="scrim_nav_header">#40000000</color>
+    <!-- 60% black-->
+    <!-- 30% black-->
     <color name="error">#ffdd2c00</color>
-    <color name="searchbox_icon_tint">#a4a4a4</color>
+
+    <color name="red_special">#F9063F</color>
+    <color name="green_special">#64DD17</color>
 
     <!-- text (most text uses material theme colours) -->
-    <color name="hint_disabled_dark">#43000000</color> <!-- 26% black -->
+    <!-- 26% black -->
 
-    <color name="tab_home">@color/colorPrimary</color>
-    <color name="tab_forum">@color/colorAccent</color>
-    <color name="tab_notification">#4CAF50</color>
+    <color name="menu_favorites">#FFE500</color>
+
 </resources>

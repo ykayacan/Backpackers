@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <datastore-indexes autoGenerate="true">
-    <!--<datastore-index ancestor="false" kind="TimelineFeed">
-        <property name="createdAt" direction="asc" />
-    </datastore-index>-->
+    <datastore-index ancestor="false" kind="Comment">
+        <property name="commentableKey" direction="asc"/>
+        <property name="createdAt" direction="desc" />
+    </datastore-index>
+
+    <datastore-index ancestor="true" kind="ForumPost">
+        <property name="createdAt" direction="desc" />
+    </datastore-index>
+
+    <datastore-index ancestor="true" kind="Notification">
+        <property name="createdAt" direction="desc" />
+    </datastore-index>
 </datastore-indexes>

@@ -4,37 +4,105 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/background_lightish</item>
+    </style>
+
+    <!-- Activities -->
+    <style name="Yoloo.SignIn">
         <item name="android:windowBackground">@color/background_light</item>
     </style>
 
-    <style name="Yoloo.SignIn">
-        <item name="colorAccent">@color/colorPrimary</item>
-    </style>
-
-    <style name="Yoloo.YolooSignIn">
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
-    </style>
-
-    <style name="Yoloo.YolooSignUp">
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
-    </style>
-
     <style name="Yoloo.Home">
+        <item name="drawerArrowStyle">@style/Widget.Yoloo.DrawerArrow</item>
     </style>
+
+    <style name="Yoloo.Comment">
+        <item name="android:windowBackground">@android:color/background_dark</item>
+    </style>
+
+    <style name="Yoloo.Photo">
+        <item name="android:windowBackground">@android:color/background_dark</item>
+    </style>
+
+    <style name="Yoloo.Write">
+        <item name="colorPrimary">@color/colorPrimaryBlue</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkBlue</item>
+
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+    <style name="Yoloo.Location">
+        <item name="colorPrimary">@color/colorPrimaryBlue</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkBlue</item>
+
+        <item name="android:windowBackground">@color/background_light</item>
+    </style>
+
+    <style name="Yoloo.Profile">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+    <style name="Yoloo.Search">
+        <item name="colorPrimary">@color/colorPrimaryBlue</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkBlue</item>
+
+        <item name="android:windowBackground">@color/background_light</item>
+    </style>
+
 
     <style name="Theme.Yoloo.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Yoloo.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Widget.Yoloo.SignInButton" parent="Widget.AppCompat.Button.Colored">
-        <item name="android:textColor">?attr/colorPrimary</item>
+
+    <style name="TextAppearance.Yoloo.HomeSearchToolbar" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@android:color/secondary_text_dark</item>
     </style>
 
     <style name="TextAppearance.Yoloo.TextInputLayout" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/error</item>
         <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.Post" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">15sp</item>
+        <!--<item name="android:textColor">@color/text_secondary_dark</item>-->
+    </style>
+
+    <style name="TextAppearance.Post.Small" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">14sp</item>
+        <!--<item name="android:textColor">@color/text_secondary_dark</item>-->
+    </style>
+
+    <style name="Widget.Yoloo" parent="android:Widget" />
+
+    <style name="Widget.Yoloo.OrangeButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorPrimary</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Widget.Yoloo.WhiteButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@android:color/white</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="Widget.Yoloo.DrawerArrow" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/icon_active</item>
+    </style>
+
+    <style name="Widget.Yoloo.Post">
+        <item name="android:textAppearance">@style/TextAppearance.Post</item>
+        <item name="lineHeightHint">24sp</item>
+    </style>
+
+    <style name="Widget.Yoloo.ThumbOverFlow" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_cancel_black_24dp</item>
+    </style>
+
+    <style name="Widget.Yoloo.BadgeDialog">
+        <item name="android:windowEnterAnimation">@anim/scale_in</item>
     </style>
 
     <style name="Yoloo.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

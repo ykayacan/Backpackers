@@ -26,7 +26,7 @@
 
     <!--<filter>
         <filter-name>ValidationFilter</filter-name>
-        <filter-class>com.yoloo.android.backend.filter.ValidationFilter</filter-class>
+        <filter-class>ValidationFilter</filter-class>
     </filter>
 
     <filter-mapping>
@@ -37,7 +37,7 @@
     <!-- Listeners -->
 
     <listener>
-        <listener-class>com.yoloo.android.backend.service.OfyHelper</listener-class>
+        <listener-class>com.backpackers.android.backend.service.OfyHelper</listener-class>
     </listener>
 
     <!-- Servlets -->
@@ -47,16 +47,19 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.yoloo.android.backend.api.RegistrationEndpoint,
-                com.yoloo.android.backend.api.MessagingEndpoint,
-                com.yoloo.android.backend.api.UserEndpoint,
-                com.yoloo.android.backend.api.ForumEndpoint,
-                com.yoloo.android.backend.api.LikeEndpoint,
-                com.yoloo.android.backend.api.CommentEndpoint,
-                com.yoloo.android.backend.api.FollowEndpoint,
-                com.yoloo.android.backend.api.TokenEndpoint,
-                com.yoloo.android.backend.api.PostEndpoint,
-                com.yoloo.android.backend.api.VoteEndpoint
+            <param-value>com.backpackers.android.backend.api.RegistrationEndpoint,
+                com.backpackers.android.backend.api.MessagingEndpoint,
+                com.backpackers.android.backend.api.UserEndpoint,
+                com.backpackers.android.backend.api.ForumEndpoint,
+                com.backpackers.android.backend.api.LikeEndpoint,
+                com.backpackers.android.backend.api.CommentEndpoint,
+                com.backpackers.android.backend.api.FollowEndpoint,
+                com.backpackers.android.backend.api.TokenEndpoint,
+                com.backpackers.android.backend.api.PostEndpoint,
+                com.backpackers.android.backend.api.VoteEndpoint,
+                com.backpackers.android.backend.api.MediaEndpoint,
+                com.backpackers.android.backend.api.SearchEndpoint,
+                com.backpackers.android.backend.api.NotificationEndpoint
             </param-value>
         </init-param>
     </servlet>
@@ -77,18 +80,18 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Upload</servlet-name>
-        <servlet-class>com.yoloo.android.backend.servlet.UploadServlet</servlet-class>
+        <servlet-name>UploadServlet</servlet-name>
+        <servlet-class>com.backpackers.android.backend.servlet.UploadServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>Upload</servlet-name>
+        <servlet-name>UploadServlet</servlet-name>
         <url-pattern>/upload</url-pattern>
     </servlet-mapping>
 
     <servlet>
         <servlet-name>Serve</servlet-name>
-        <servlet-class>com.yoloo.android.backend.servlet.ServeServlet</servlet-class>
+        <servlet-class>com.backpackers.android.backend.servlet.ServeServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -97,23 +100,53 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>CreateTimeline</servlet-name>
-        <servlet-class>com.yoloo.android.backend.servlet.CreateTimelineServlet</servlet-class>
+        <servlet-name>CreateTimelineServlet</servlet-name>
+        <servlet-class>com.backpackers.android.backend.servlet.CreateTimelineServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>CreateTimeline</servlet-name>
+        <servlet-name>CreateTimelineServlet</servlet-name>
         <url-pattern>/tasks/createTimeline</url-pattern>
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>RemoveTimeline</servlet-name>
-        <servlet-class>com.yoloo.android.backend.servlet.RemoveTimelineServlet</servlet-class>
+        <servlet-name>RemoveTimelineServlet</servlet-name>
+        <servlet-class>com.backpackers.android.backend.servlet.RemoveTimelineServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>RemoveTimeline</servlet-name>
+        <servlet-name>RemoveTimelineServlet</servlet-name>
         <url-pattern>/tasks/removeTimeline</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UpdateRankServlet</servlet-name>
+        <servlet-class>com.backpackers.android.backend.servlet.UpdateRankServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UpdateRankServlet</servlet-name>
+        <url-pattern>/tasks/updaterank</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>NotificationTaskServlet</servlet-name>
+        <servlet-class>com.backpackers.android.backend.servlet.NotificationTaskServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>NotificationTaskServlet</servlet-name>
+        <url-pattern>/tasks/sendfcm</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MaintenanceTasksServlet</servlet-name>
+        <servlet-class>com.backpackers.android.backend.servlet.MaintenanceTasksServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>MaintenanceTasksServlet</servlet-name>
+        <url-pattern>/admin/buildsearchindex</url-pattern>
     </servlet-mapping>
 
     <!-- End Servlets -->
@@ -122,6 +155,36 @@
         <web-resource-collection>
             <web-resource-name>appstats</web-resource-name>
             <url-pattern>/appstats/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>MaintenanceTasksServlet</web-resource-name>
+            <url-pattern>/admin/buildsearchindex</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>UpdateRankServlet</web-resource-name>
+            <url-pattern>/tasks/updaterank</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>NotificationTaskServlet</web-resource-name>
+            <url-pattern>/tasks/sendfcm</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>

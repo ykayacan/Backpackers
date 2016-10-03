@@ -4,21 +4,46 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/background_lightish</item>
+
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementsUseOverlay">false</item>
     </style>
 
+    <!-- Activities -->
     <style name="Yoloo.SignIn">
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="Yoloo.Home">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="drawerArrowStyle">@style/Widget.Yoloo.DrawerArrow</item>
     </style>
 
-    <style name="Widget.Yoloo.SignInButton" parent="Widget.AppCompat.Button.Colored">
+    <style name="Yoloo.Comment">
+        <item name="android:windowBackground">@android:color/background_dark</item>
+        <item name="android:statusBarColor">@android:color/background_dark</item>
+    </style>
+
+    <style name="Yoloo.Photo">
+        <item name="android:windowBackground">@android:color/background_dark</item>
+        <item name="colorPrimaryDark">@android:color/background_dark</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+
+    <style name="Widget.Yoloo.OrangeButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:colorButtonNormal">@color/colorPrimary</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Widget.Yoloo.WhiteButton" parent="Widget.AppCompat.Button.Colored">
         <item name="android:colorButtonNormal">@android:color/white</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
 </resources>

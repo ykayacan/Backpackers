@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_profile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_scrollFlags="scroll|snap"
+    tools:context="com.backpackers.android.ui.profile.ProfileActivity"
+    tools:showIn="@layout/activity_profile">
+
+    <ImageView
+        android:id="@+id/image_profile_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foreground="@drawable/scrim_gradient"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile_bg"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.backpackers.android.ui.widget.CircleImageView
+        android:id="@+id/image_avatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        android:transitionName="@string/transition_profile_avatar"
+        app:civ_border_color="@android:color/white"
+        app:civ_border_width="2dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/profile_bg" />
+
+    <TextView
+        android:id="@+id/text_avatar_level"
+        style="@style/TextAppearance.AppCompat"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginStart="48dp"
+        android:background="@drawable/circle_level"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
+        app:layout_constraintLeft_toLeftOf="@+id/image_avatar"
+        app:layout_constraintTop_toTopOf="@+id/image_avatar"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="3" />
+
+    <com.backpackers.android.ui.widget.BaselineGridTextView
+        android:id="@+id/text_username"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        app:layout_constraintLeft_toLeftOf="@+id/image_avatar"
+        app:layout_constraintRight_toRightOf="@+id/image_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/image_avatar"
+        tools:text="Duygu Keşkek" />
+
+    <Button
+        android:id="@+id/btn_follow_unfollow"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="32dp"
+        android:background="@drawable/selector_follow_btn"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toRightOf="@+id/image_avatar"
+        app:layout_constraintRight_toRightOf="@+id/image_profile_bg"
+        app:layout_constraintTop_toTopOf="@+id/image_avatar" />
+
+    <TextView
+        android:id="@+id/text_short_desc"
+        style="@style/TextAppearance.AppCompat"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginStart="24dp"
+        android:gravity="center"
+        android:maxLines="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_username" />
+
+    <TextView
+        android:id="@+id/text_posts_count"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.27"
+        app:layout_constraintLeft_toLeftOf="@+id/image_profile_bg"
+        app:layout_constraintRight_toRightOf="@+id/image_profile_bg"
+        app:layout_constraintTop_toBottomOf="@+id/text_short_desc"
+        tools:text="246" />
+
+    <com.backpackers.android.ui.widget.BaselineGridTextView
+        android:id="@+id/text_posts"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/label_posts"
+        app:layout_constraintLeft_toLeftOf="@+id/text_posts_count"
+        app:layout_constraintRight_toRightOf="@+id/text_posts_count"
+        app:layout_constraintTop_toBottomOf="@+id/text_posts_count" />
+
+    <TextView
+        android:id="@+id/text_follower_count"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_short_desc"
+        tools:text="5119" />
+
+    <com.backpackers.android.ui.widget.BaselineGridTextView
+        android:id="@+id/text_follower"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/label_follower"
+        app:layout_constraintLeft_toLeftOf="@+id/text_follower_count"
+        app:layout_constraintRight_toRightOf="@+id/text_follower_count"
+        app:layout_constraintTop_toBottomOf="@+id/text_follower_count" />
+
+    <TextView
+        android:id="@+id/text_followee_count"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintLeft_toLeftOf="@+id/image_profile_bg"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_short_desc"
+        tools:text="3016" />
+
+    <com.backpackers.android.ui.widget.BaselineGridTextView
+        android:id="@+id/text_followee"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/label_followee"
+        app:layout_constraintLeft_toLeftOf="@+id/text_followee_count"
+        app:layout_constraintRight_toRightOf="@+id/text_followee_count"
+        app:layout_constraintTop_toBottomOf="@+id/text_followee_count" />
+
+</android.support.constraint.ConstraintLayout>
