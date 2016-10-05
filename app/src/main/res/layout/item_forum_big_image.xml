@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/profile_bg" />
 
-    <com.backpackers.android.ui.widget.ReadMoreTextView
+    <com.backpackers.android.ui.widget.BaselineGridTextView
         android:id="@+id/text_content"
         style="@style/Widget.Yoloo.Post"
         android:layout_width="0dp"
@@ -34,8 +34,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/image_content"
-        app:trimLines="10"
-        app:trimMode="trimModeLine"
         tools:text="@string/lorem_ipsum" />
 
     <com.luseen.autolinklibrary.AutoLinkTextView

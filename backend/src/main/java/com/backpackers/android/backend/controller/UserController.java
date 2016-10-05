@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
+import static com.backpackers.android.backend.service.OfyHelper.ofy;
+
 public class UserController {
 
     /**
@@ -77,13 +79,13 @@ public class UserController {
      * @param parentUserKey the parent user key
      */
     public static void addShards(final int count, final Key<Account> parentUserKey) {
-        OfyHelper.ofy().transact(new VoidWork() {
+        ofy().transact(new VoidWork() {
             @Override
             public void vrun() {
                 UserIndexShardCounter counter;
                 int value;
                 try {
-                    counter = OfyHelper.ofy().load().type(UserIndexShardCounter.class)
+                    counter = ofy().load().type(UserIndexShardCounter.class)
                             .ancestor(parentUserKey).first().safe();
                     value = counter.getShardCount() + count;
                 } catch (NotFoundException e) {
@@ -91,7 +93,7 @@ public class UserController {
                     value = INITIAL_SHARDS + count;
                 }
                 counter.setShardCount(value);
-                OfyHelper.ofy().save().entity(counter).now();
+                ofy().save().entity(counter).now();
             }
         });
     }
@@ -106,12 +108,12 @@ public class UserController {
         final Key<Account> requesterKey = Key.create(user.getUserId());
         final Key<Account> userKey = Key.create(websafeUserId);
 
-        final Account account = OfyHelper.ofy().load().key(userKey).now();
+        final Account account = ofy().load().key(userKey).now();
 
         final List<UserCounterShard> shards =
-                OfyHelper.ofy().load().type(UserCounterShard.class).ancestor(userKey).list();
+                ofy().load().type(UserCounterShard.class).ancestor(userKey).list();
 
-        final Key<?> key = OfyHelper.ofy().load().type(Follow.class)
+        final Key<?> key = ofy().load().type(Follow.class)
                 .ancestor(requesterKey)
                 .filter("followeeKey =", userKey)
                 .keys().first().now();
@@ -132,10 +134,10 @@ public class UserController {
     public Account getSelf(final String websafeUserId) {
         final Key<Account> userKey = Key.create(websafeUserId);
 
-        final Account account = OfyHelper.ofy().load().key(userKey).now();
+        final Account account = ofy().load().key(userKey).now();
 
         final List<UserCounterShard> shards =
-                OfyHelper.ofy().load().type(UserCounterShard.class).ancestor(userKey).list();
+                ofy().load().type(UserCounterShard.class).ancestor(userKey).list();
 
         setExtraUserFields(account, shards);
 
@@ -144,9 +146,9 @@ public class UserController {
             Badge badge = new FirstUserBadge();
             account.addBadge(new FirstUserBadge());
 
-            OfyHelper.ofy().save().entity(account);
+            ofy().save().entity(account);
 
-            RegistrationRecord record = OfyHelper.ofy().load().type(RegistrationRecord.class)
+            RegistrationRecord record = ofy().load().type(RegistrationRecord.class)
                     .ancestor(userKey).first().now();
 
             NotificationHelper.sendAchievementNotification(record.getRegId(),
@@ -169,7 +171,7 @@ public class UserController {
 
         final Key<Account> userKey = Key.create(websafeUserId);
 
-        Query<Follow> query = OfyHelper.ofy().load().type(Follow.class);
+        Query<Follow> query = ofy().load().type(Follow.class);
 
         query = query.filter("followeeKey =", userKey);
 
@@ -186,10 +188,10 @@ public class UserController {
         while (queryIterator.hasNext()) {
             // Get post key.
             final Follow follow = queryIterator.next();
-            followerKeys.add(follow.getFolloweeKey());
+            followerKeys.add(follow.getParentUserKey());
         }
 
-        final Collection<Account> accounts = OfyHelper.ofy().load().keys(followerKeys).values();
+        final Collection<Account> accounts = ofy().load().keys(followerKeys).values();
 
         return CollectionResponse.<Account>builder()
                 .setItems(accounts)
@@ -210,7 +212,7 @@ public class UserController {
 
         final Key<Account> userKey = Key.create(websafeUserId);
 
-        Query<Follow> query = OfyHelper.ofy().load().type(Follow.class).ancestor(userKey);
+        Query<Follow> query = ofy().load().type(Follow.class).ancestor(userKey);
 
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
@@ -228,7 +230,7 @@ public class UserController {
             followingKeys.add(follow.getFolloweeKey());
         }
 
-        final Collection<Account> accounts = OfyHelper.ofy().load().keys(followingKeys).values();
+        final Collection<Account> accounts = ofy().load().keys(followingKeys).values();
 
         return CollectionResponse.<Account>builder()
                 .setItems(accounts)
@@ -246,7 +248,7 @@ public class UserController {
             throws ConflictException {
         final String email = payload.getEmail();
 
-        Key<Account> userKey = OfyHelper.ofy().load().type(Account.class)
+        Key<Account> userKey = ofy().load().type(Account.class)
                 .filter("email =", email)
                 .keys().first().now();
 
@@ -254,7 +256,7 @@ public class UserController {
 
         // User already used Google login before, so return existing user.
         if (userKey != null) {
-            account = OfyHelper.ofy().load().key(userKey).now();
+            account = ofy().load().key(userKey).now();
             if (account.getProvider().compareTo(Account.Provider.GOOGLE) == 0) {
                 return account;
             } else {
@@ -262,7 +264,7 @@ public class UserController {
             }
         } else {
             // Allocate a new Id.
-            final Key<Account> newUserKey = OfyHelper.ofy().factory().allocateId(Account.class);
+            final Key<Account> newUserKey = ofy().factory().allocateId(Account.class);
 
             account = UserFactory.getAccount(new GoogleUserFactory(newUserKey, payload, locale));
 
@@ -284,7 +286,7 @@ public class UserController {
      */
     public Account add(final String[] values, final String locale) {
         // Allocate a new Id.
-        final Key<Account> userKey = OfyHelper.ofy().factory().allocateId(Account.class);
+        final Key<Account> userKey = ofy().factory().allocateId(Account.class);
 
         final Account account = UserFactory.getAccount(new YolooUserFactory(userKey, values, locale));
 
@@ -302,7 +304,7 @@ public class UserController {
         Media m = null;
 
         if (!Strings.isNullOrEmpty(mediaId)) {
-            Map<Key<Object>, Object> map = OfyHelper.ofy().load()
+            Map<Key<Object>, Object> map = ofy().load()
                     .keys(Key.<Account>create(user.getUserId()), Key.<Media>create(mediaId));
 
             for (Object o : map.values()) {
@@ -315,7 +317,7 @@ public class UserController {
 
             a.setProfileImageUrl(m.getUrl().getValue().concat("=s120"));
 
-            List<Object> userEntities = OfyHelper.ofy().load().group(ForumPost.class, Comment.class)
+            List<Object> userEntities = ofy().load().group(ForumPost.class, Comment.class)
                     .ancestor(a.getKey()).list();
 
             List<Object> updateList = new ArrayList<>(userEntities.size());
@@ -329,7 +331,7 @@ public class UserController {
                 updateList.add(o);
             }
 
-            OfyHelper.ofy().save().entities(updateList);
+            ofy().save().entities(updateList);
         }
 
         return a;
@@ -358,10 +360,10 @@ public class UserController {
         // Add +1 to numShards to make it inclusive.
         final int shardNum = ThreadLocalRandom.current().nextInt(1, numShards + 1);
 
-        final RegistrationRecord record = OfyHelper.ofy().load().type(RegistrationRecord.class)
+        final RegistrationRecord record = ofy().load().type(RegistrationRecord.class)
                 .ancestor(followeeKey).first().now();
 
-        final Account sender = OfyHelper.ofy().load().key(followerKey).now();
+        final Account sender = ofy().load().key(followerKey).now();
 
         final Notification notification = getNotification(sender, followeeKey);
 
@@ -381,16 +383,16 @@ public class UserController {
         Key<Account> followerKey = Key.create(user.getUserId());
         Key<Account> followeeKey = Key.create(websafeFolloweeId);
 
-        final Key<Follow> followKey = OfyHelper.ofy().load().type(Follow.class)
+        final Key<Follow> followKey = ofy().load().type(Follow.class)
                 .ancestor(followerKey).filter("followeeKey =", followeeKey)
                 .keys().first().now();
 
-        final UserCounterShard followerShard = OfyHelper.ofy().load().type(UserCounterShard.class)
+        final UserCounterShard followerShard = ofy().load().type(UserCounterShard.class)
                 .ancestor(followerKey).first().now();
 
         followerShard.setFolloweeCount(followerShard.getFolloweeCount() - 1);
 
-        final UserCounterShard followeeShard = OfyHelper.ofy().load().type(UserCounterShard.class)
+        final UserCounterShard followeeShard = ofy().load().type(UserCounterShard.class)
                 .ancestor(followeeKey).first().now();
 
         followeeShard.setFollowerCount(followeeShard.getFollowerCount() - 1);
@@ -402,7 +404,7 @@ public class UserController {
                                    final Key<Account> followeeKey,
                                    final Follow follow, final int shardNum,
                                    final Notification notification) {
-        OfyHelper.ofy().transact(new VoidWork() {
+        ofy().transact(new VoidWork() {
             @Override
             public void vrun() {
                 UserCounterShard followerShard;
@@ -411,11 +413,11 @@ public class UserController {
                 long followerCount;
 
                 try {
-                    followerShard = OfyHelper.ofy().load().type(UserCounterShard.class)
+                    followerShard = ofy().load().type(UserCounterShard.class)
                             .parent(followerKey).id(shardNum).safe();
                     followeeCount = followerShard.getFolloweeCount() + 1;
 
-                    followeeShard = OfyHelper.ofy().load().type(UserCounterShard.class)
+                    followeeShard = ofy().load().type(UserCounterShard.class)
                             .parent(followeeKey).id(shardNum).safe();
                     followerCount = followeeShard.getFollowerCount() + 1;
                 } catch (NotFoundException e) {
@@ -428,7 +430,7 @@ public class UserController {
                 followerShard.setFolloweeCount(followeeCount);
                 followeeShard.setFollowerCount(followerCount);
 
-                OfyHelper.ofy().save().entities(follow, followerShard, followeeShard, notification);
+                ofy().save().entities(follow, followerShard, followeeShard, notification);
             }
         });
     }
@@ -436,25 +438,25 @@ public class UserController {
     private void runUnFollowTransact(final Key<Follow> followKey,
                                      final UserCounterShard followerShard,
                                      final UserCounterShard followeeShard) {
-        OfyHelper.ofy().transact(new VoidWork() {
+        ofy().transact(new VoidWork() {
             @Override
             public void vrun() {
-                OfyHelper.ofy().delete().keys(followKey);
-                OfyHelper.ofy().save().entities(followerShard, followeeShard).now();
+                ofy().delete().keys(followKey);
+                ofy().save().entities(followerShard, followeeShard).now();
             }
         });
     }
 
     private Account save(final Account account, final UserCounterShard shard) {
-        return OfyHelper.ofy().transact(new Work<Account>() {
+        return ofy().transact(new Work<Account>() {
             @Override
             public Account run() {
-                Map<Key<Object>, Object> map = OfyHelper.ofy().save().entities(account, shard).now();
+                Map<Key<Object>, Object> map = ofy().save().entities(account, shard).now();
 
                 for (Key<Object> key : map.keySet()) {
                     if (key.getKind().equals("Account")) {
                         setExtraUserFields(account, Collections.singletonList(shard));
-                        return (Account) OfyHelper.ofy().load().key(key).now();
+                        return (Account) ofy().load().key(key).now();
                     }
                 }
 
@@ -481,7 +483,7 @@ public class UserController {
 
     private int getShardCount(final Key<Account> parentUserKey) {
         try {
-            return OfyHelper.ofy().load().type(UserIndexShardCounter.class)
+            return ofy().load().type(UserIndexShardCounter.class)
                     .ancestor(parentUserKey).first().safe().getShardCount();
         } catch (com.googlecode.objectify.NotFoundException e) {
             return INITIAL_SHARDS;

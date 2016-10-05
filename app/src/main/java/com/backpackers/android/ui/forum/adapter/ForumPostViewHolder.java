@@ -3,7 +3,6 @@ package com.backpackers.android.ui.forum.adapter;
 import com.backpackers.android.R;
 import com.backpackers.android.ui.widget.CheckableImageButton;
 import com.backpackers.android.ui.widget.CircleImageView;
-import com.backpackers.android.ui.widget.ReadMoreTextView;
 import com.backpackers.android.ui.widget.RelativeTimeTextView;
 import com.luseen.autolinklibrary.AutoLinkTextView;
 
@@ -34,7 +33,7 @@ public class ForumPostViewHolder extends RecyclerView.ViewHolder {
     public RelativeTimeTextView mTimePassedTv;
 
     @BindView(R.id.text_content)
-    public ReadMoreTextView mContentTv;
+    public TextView mContentTv;
 
     @BindView(R.id.image_content)
     @Nullable

@@ -4,12 +4,13 @@
     android:id="@+id/content_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yoloo.android.com.backpackers.android.ui.forum.ForumFragment">
+    tools:context="com.backpackers.android.ui.forum.ForumFragment">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent">
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tablayout_category"

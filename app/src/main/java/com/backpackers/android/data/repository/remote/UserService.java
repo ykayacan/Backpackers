@@ -10,7 +10,6 @@ import com.backpackers.android.util.ServerHelper;
 import java.util.concurrent.Callable;
 
 import rx.Observable;
-import timber.log.Timber;
 
 public class UserService {
 
@@ -31,8 +30,6 @@ public class UserService {
     }
 
     public Observable<Account> createGoogleAccount(final String token, final String locale) {
-        Timber.d("token: %s", token);
-        Timber.d("locale: %s", locale);
         return Observable.fromCallable(new Callable<Account>() {
             @Override
             public Account call() throws Exception {
@@ -107,7 +104,8 @@ public class UserService {
     }
 
     public Observable<CollectionResponseAccount> listSelfFollowers(final char[] accessToken,
-                                                                   final String nextPageToken, final int limit) {
+                                                                   final String nextPageToken,
+                                                                   final int limit) {
         return Observable.fromCallable(new Callable<CollectionResponseAccount>() {
             @Override
             public CollectionResponseAccount call() throws Exception {
@@ -125,8 +123,9 @@ public class UserService {
         });
     }
 
-    public Observable<CollectionResponseAccount> listSelfFollowees(final char[] accessToken,
-                                                                   final String nextPageToken, final int limit) {
+    public Observable<CollectionResponseAccount> listSelfFollowings(final char[] accessToken,
+                                                                    final String nextPageToken,
+                                                                    final int limit) {
         return Observable.fromCallable(new Callable<CollectionResponseAccount>() {
             @Override
             public CollectionResponseAccount call() throws Exception {
@@ -162,8 +161,8 @@ public class UserService {
         });
     }
 
-    public Observable<CollectionResponseAccount> listFollowees(final char[] accessToken, final String userId,
-                                                               final String nextPageToken, final int limit) {
+    public Observable<CollectionResponseAccount> listFollowings(final char[] accessToken, final String userId,
+                                                                final String nextPageToken, final int limit) {
         return Observable.fromCallable(new Callable<CollectionResponseAccount>() {
             @Override
             public CollectionResponseAccount call() throws Exception {

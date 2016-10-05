@@ -60,9 +60,9 @@ public class UserRepository {
     public Observable<CollectionResponseAccount> listFollowees(final char[] accessToken, final String userId,
                                                                final String nextPageToken, final int limit) {
         if (userId == null) {
-            return mService.listSelfFollowees(accessToken, nextPageToken, limit);
+            return mService.listSelfFollowings(accessToken, nextPageToken, limit);
         } else {
-            return mService.listFollowees(accessToken, userId, nextPageToken, limit);
+            return mService.listFollowings(accessToken, userId, nextPageToken, limit);
         }
     }
 }

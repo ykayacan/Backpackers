@@ -100,16 +100,15 @@ public class FollowActivity extends BaseAuthActivity<FollowView, FollowPresenter
 
     @Override
     public void onLoadStarted(boolean isPullToRefresh, String cursor) {
-        Timber.d("Mode: %s", mMode);
-        if (mMode == 0) {
+        if (mMode == MODE_FOLLOWERS) {
             if (getUserId().equals(mUserId)) {
-                getPresenter().listFollowers(getAccessToken(), getUserId(), mNextPageToken, 20);
+                getPresenter().listFollowers(getAccessToken(), null, mNextPageToken, 20);
             } else {
                 getPresenter().listFollowers(getAccessToken(), mUserId, mNextPageToken, 20);
             }
         } else {
             if (getUserId().equals(mUserId)) {
-                getPresenter().listFollowees(getAccessToken(), getUserId(), mNextPageToken, 20);
+                getPresenter().listFollowees(getAccessToken(), null, mNextPageToken, 20);
             } else {
                 getPresenter().listFollowees(getAccessToken(), mUserId, mNextPageToken, 20);
             }

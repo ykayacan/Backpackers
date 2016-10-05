@@ -118,7 +118,7 @@
 
     </LinearLayout>
 
-    <com.backpackers.android.ui.widget.ReadMoreTextView
+    <com.backpackers.android.ui.widget.BaselineGridTextView
         android:id="@+id/text_content"
         style="@style/Widget.Yoloo.Post"
         android:layout_width="wrap_content"
@@ -128,8 +128,6 @@
         android:layout_marginRight="16dp"
         android:layout_marginStart="56dp"
         android:layout_marginTop="52dp"
-        app:trimLines="7"
-        app:trimMode="trimModeLine"
         tools:text="Hello" />
 
     <com.luseen.autolinklibrary.AutoLinkTextView

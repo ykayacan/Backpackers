@@ -16,7 +16,6 @@ import com.backpackers.android.ui.listeners.OnReadMoreClickListener;
 import com.backpackers.android.ui.listeners.OnVoteActionClickListener;
 import com.backpackers.android.ui.recyclerview.AbsAdapterDelegate;
 import com.backpackers.android.ui.widget.CheckableImageButton;
-import com.backpackers.android.ui.widget.ReadMoreTextView;
 import com.backpackers.android.util.DrawableHelper;
 import com.backpackers.android.util.StringUtils;
 import com.bumptech.glide.Glide;
@@ -29,6 +28,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +105,12 @@ public class ForumImageDelegate extends AbsAdapterDelegate<ForumPost, ForumPostV
 
         bindLocation(item, holder);
 
-        holder.mContentTv.setText(item.getContent());
+        if (item.getContent().trim().length() > 305) {
+            String content = item.getContent().substring(0, 305).concat("... <b>read more<b>");
+            holder.mContentTv.setText(Html.fromHtml(content));
+        } else {
+            holder.mContentTv.setText(item.getContent());
+        }
 
         bindContentImage(item, holder);
 
@@ -255,7 +260,7 @@ public class ForumImageDelegate extends AbsAdapterDelegate<ForumPost, ForumPostV
             }
         });
 
-        vh.mContentTv.setOnReadMoreListener(new ReadMoreTextView.OnReadMoreListener() {
+        /*vh.mContentTv.setOnReadMoreListener(new ReadMoreTextView.OnReadMoreListener() {
             @Override
             public void onReadMore(View v) {
                 final int pos = vh.getAdapterPosition();
@@ -264,7 +269,7 @@ public class ForumImageDelegate extends AbsAdapterDelegate<ForumPost, ForumPostV
                     mOnReadMoreClickListener.onReadMoreClick(v, pos, post);
                 }
             }
-        });
+        });*/
 
         if (vh.mContentImage != null) {
             vh.mContentImage.setOnClickListener(new View.OnClickListener() {
