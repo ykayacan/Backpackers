@@ -5,4 +5,9 @@
 /build
 /captures
 /.idea
+/app/app-release.apk
 /backend/build/
+app/src/main/java/com/backpackers/android/data/repository/local/
+backend/src/main/java/com/backpackers/android/backend/factory/media/
+backend/src/main/webapp/css/
+backend/src/main/webapp/js/
