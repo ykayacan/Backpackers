@@ -39,7 +39,6 @@ dependencies {
     compile 'com.drewnoakes:metadata-extractor:2.9.1'
     compile 'joda-time:joda-time:2.9.4'
 
-
     testCompile 'junit:junit:4.12'
     testCompile "com.google.appengine:appengine-api-stubs:$APP_ENGINE_VERSION"
     testCompile "com.google.appengine:appengine-testing:$APP_ENGINE_VERSION"

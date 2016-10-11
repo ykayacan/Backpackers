@@ -143,8 +143,10 @@ public class UserService {
         });
     }
 
-    public Observable<CollectionResponseAccount> listFollowers(final char[] accessToken, final String userId,
-                                                               final String nextPageToken, final int limit) {
+    public Observable<CollectionResponseAccount> listFollowers(final char[] accessToken,
+                                                               final String userId,
+                                                               final String nextPageToken,
+                                                               final int limit) {
         return Observable.fromCallable(new Callable<CollectionResponseAccount>() {
             @Override
             public CollectionResponseAccount call() throws Exception {
@@ -161,8 +163,10 @@ public class UserService {
         });
     }
 
-    public Observable<CollectionResponseAccount> listFollowings(final char[] accessToken, final String userId,
-                                                                final String nextPageToken, final int limit) {
+    public Observable<CollectionResponseAccount> listFollowings(final char[] accessToken,
+                                                                final String userId,
+                                                                final String nextPageToken,
+                                                                final int limit) {
         return Observable.fromCallable(new Callable<CollectionResponseAccount>() {
             @Override
             public CollectionResponseAccount call() throws Exception {
@@ -179,8 +183,10 @@ public class UserService {
         });
     }
 
-    public Observable<CollectionResponseAccount> list(final char[] accessToken, final String query,
-                                                      final String nextPageToken, final int limit) {
+    public Observable<CollectionResponseAccount> list(final char[] accessToken,
+                                                      final String query,
+                                                      final String nextPageToken,
+                                                      final int limit) {
         return Observable.fromCallable(new Callable<CollectionResponseAccount>() {
             @Override
             public CollectionResponseAccount call() throws Exception {
