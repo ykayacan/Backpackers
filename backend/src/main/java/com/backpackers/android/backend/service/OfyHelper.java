@@ -1,15 +1,5 @@
 package com.backpackers.android.backend.service;
 
-import com.backpackers.android.backend.model.comment.Comment;
-import com.backpackers.android.backend.model.feed.post.ForumPost;
-import com.backpackers.android.backend.model.hashtag.HashTag;
-import com.backpackers.android.backend.model.like.Like;
-import com.backpackers.android.backend.model.location.Location;
-import com.backpackers.android.backend.model.media.Media;
-import com.backpackers.android.backend.model.notification.Notification;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.ObjectifyFactory;
-import com.googlecode.objectify.ObjectifyService;
 import com.backpackers.android.backend.badge.EntrepreneurBadge;
 import com.backpackers.android.backend.badge.FirstUserBadge;
 import com.backpackers.android.backend.badge.NewbieBadge;
@@ -17,13 +7,23 @@ import com.backpackers.android.backend.badge.WastedBadge;
 import com.backpackers.android.backend.badge.WelcomeBadge;
 import com.backpackers.android.backend.model.RegistrationRecord;
 import com.backpackers.android.backend.model.Token;
+import com.backpackers.android.backend.model.comment.Comment;
 import com.backpackers.android.backend.model.feed.TimelineFeed;
+import com.backpackers.android.backend.model.feed.post.ForumPost;
 import com.backpackers.android.backend.model.feed.post.NormalPost;
 import com.backpackers.android.backend.model.follow.Follow;
+import com.backpackers.android.backend.model.hashtag.HashTag;
+import com.backpackers.android.backend.model.like.Like;
+import com.backpackers.android.backend.model.location.Location;
+import com.backpackers.android.backend.model.media.Media;
+import com.backpackers.android.backend.model.notification.Notification;
 import com.backpackers.android.backend.model.user.Account;
 import com.backpackers.android.backend.model.user.UserCounterShard;
 import com.backpackers.android.backend.model.user.UserIndexShardCounter;
 import com.backpackers.android.backend.model.vote.Vote;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.ObjectifyFactory;
+import com.googlecode.objectify.ObjectifyService;
 
 /**
  * OfyHelper, a ServletContextListener, is setup in web.xml to run before a JSP is run.  This is

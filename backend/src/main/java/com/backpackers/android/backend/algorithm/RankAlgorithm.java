@@ -14,7 +14,7 @@ public class RankAlgorithm {
         return new RankAlgorithm();
     }
 
-    private static double round(double value) {
+    private static double round(final double value) {
         return Double.parseDouble(FORMAT.format(value));
     }
 
@@ -22,7 +22,7 @@ public class RankAlgorithm {
         return ups - downs;
     }
 
-    private static byte sign(long score) {
+    private static byte sign(final long score) {
         if (score > 0) {
             return 1;
         } else if (score < 0) {
@@ -33,15 +33,15 @@ public class RankAlgorithm {
     }
 
     public static double getHotRank(long ups, long downs, Date createdAt) {
-        long score = score(ups, downs);
+        final long score = score(ups, downs);
 
-        double order = Math.log10(Math.max(Math.abs(score), 1));
+        final double order = Math.log10(Math.max(Math.abs(score), 1));
 
-        byte sign = sign(score);
+        final byte sign = sign(score);
 
-        long seconds = (createdAt.getTime() / 1000) - 1134028003;
+        final long seconds = (createdAt.getTime() / 1000) - 1134028003;
 
-        double rank = sign * order + seconds / 45000;
+        final double rank = sign * order + seconds / 45000;
 
         return round(rank);
     }

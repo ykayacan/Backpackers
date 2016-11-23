@@ -7,6 +7,8 @@ import com.google.appengine.api.datastore.Link;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonPropertyOrder;
 
+import com.backpackers.android.backend.algorithm.bcrypt.BCrypt;
+import com.backpackers.android.backend.badge.Badge;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
@@ -14,9 +16,6 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.condition.IfNotDefault;
-import com.backpackers.android.backend.badge.Badge;
-
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,6 +51,11 @@ public class Account {
      */
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     private String password;
+
+    /**
+     * The real name of the user.
+     */
+    private String realName;
 
     /**
      * The provider.
@@ -95,16 +99,15 @@ public class Account {
     private boolean isFollowing;
 
     private Account() {
-
     }
 
     private Account(Builder builder) {
-        this();
         this.id = builder.id;
         this.username = builder.username;
         this.email = builder.email;
         this.password = builder.password;
         this.provider = builder.provider;
+        this.realName = builder.realName;
         this.profileImageUrl = builder.profileImageUrl;
         this.locale = builder.locale;
         this.createdAt = new Date();
@@ -212,6 +215,10 @@ public class Account {
      */
     public String getLocale() {
         return locale;
+    }
+
+    public String getRealName() {
+        return realName;
     }
 
     /**
@@ -367,6 +374,7 @@ public class Account {
         private String username;
         private Email email;
         private String password;
+        private String realName;
         private Provider provider;
         private String locale;
         private Link profileImageUrl;
@@ -421,6 +429,11 @@ public class Account {
          */
         public Builder setProvider(Provider provider) {
             this.provider = provider;
+            return this;
+        }
+
+        public Builder setRealName(String realName) {
+            this.realName = realName;
             return this;
         }
 

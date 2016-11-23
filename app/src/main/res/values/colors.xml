@@ -2,8 +2,8 @@
 <resources>
 
     <!-- app palette -->
-    <color name="colorPrimary">#FA8D31</color>
-    <color name="colorPrimaryDark">#e86d06</color>
+    <color name="colorPrimary">#EA4E25</color>
+    <color name="colorPrimaryDark">#BF3612</color>
     <color name="colorAccent">#13C3FF</color>
 
     <color name="colorPrimaryBlue">@color/colorAccent</color>

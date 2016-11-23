@@ -1,7 +1,29 @@
 package com.backpackers.android.ui.forum;
 
-
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.backpackers.android.R;
 import com.backpackers.android.backend.modal.yolooApi.model.CollectionResponseForumPost;
@@ -39,31 +61,7 @@ import com.backpackers.android.ui.search.SearchActivity;
 import com.backpackers.android.ui.write.WriteActivity;
 import com.backpackers.android.util.KeyboardUtils;
 import com.backpackers.android.util.Utils;
-
-import android.app.NotificationManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.util.ArrayList;
 

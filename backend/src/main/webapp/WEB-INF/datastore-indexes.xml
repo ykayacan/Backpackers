@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <datastore-indexes autoGenerate="true">
     <datastore-index ancestor="false" kind="Comment">
-        <property name="commentableKey" direction="asc"/>
+        <property name="commentableKey" direction="asc" />
         <property name="createdAt" direction="desc" />
     </datastore-index>
 

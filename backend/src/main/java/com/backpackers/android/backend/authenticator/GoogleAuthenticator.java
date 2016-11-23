@@ -31,8 +31,8 @@ public class GoogleAuthenticator implements Authenticator {
                 .build();
     }
 
-    public static GoogleIdToken.Payload processGoogleToken(String idToken) {
-        GoogleIdToken googleIdToken;
+    public static GoogleIdToken.Payload processGoogleToken(final String idToken) {
+        final GoogleIdToken googleIdToken;
         try {
             googleIdToken = getVerifier().verify(idToken);
         } catch (GeneralSecurityException | IOException | IllegalArgumentException e) {
@@ -47,7 +47,7 @@ public class GoogleAuthenticator implements Authenticator {
     }
 
     @Override
-    public User authenticate(HttpServletRequest request) {
+    public User authenticate(final HttpServletRequest request) {
         final String authzHeader = request.getHeader(OAuth.HeaderType.AUTHORIZATION);
 
         if (Strings.isNullOrEmpty(authzHeader) ||
@@ -57,12 +57,12 @@ public class GoogleAuthenticator implements Authenticator {
 
         final String accessToken = authzHeader.substring(6).trim();
 
-        GoogleIdToken.Payload payload = processGoogleToken(accessToken);
+        final GoogleIdToken.Payload payload = processGoogleToken(accessToken);
         if (payload == null) {
             return null;
         }
 
-        Key<Account> accountKey = getAccountKeyByEmail(payload.getEmail());
+        final Key<Account> accountKey = getAccountKeyByEmail(payload.getEmail());
         if (accountKey == null) {
             return null;
         }
@@ -70,7 +70,7 @@ public class GoogleAuthenticator implements Authenticator {
         return new User(accountKey.toWebSafeString(), "");
     }
 
-    private static Key<Account> getAccountKeyByEmail(String email) {
+    private static Key<Account> getAccountKeyByEmail(final String email) {
         return ofy().load().type(Account.class)
                 .filter("email", new Email(email))
                 .keys().first().now();

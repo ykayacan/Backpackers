@@ -44,24 +44,6 @@ public class VoteController {
 
     private void upVote(final Key<Account> userKey, final Key<ForumPost> postKey) {
         runTransact(userKey, postKey, Vote.Status.UP);
-
-        /*Collection<Object> values = ofy().load().keys(userKey, postKey).values();
-
-        Account account = null;
-        ForumPost post = null;
-        for (Object o : values) {
-            if (o instanceof Account) {
-                account = (Account) o;
-            } else if (o instanceof ForumPost) {
-                post = (ForumPost) o;
-            }
-        }
-
-        final RegistrationRecord record = ofy().load().type(RegistrationRecord.class)
-                .ancestor(Key.<Account>create(post.getWebsafeOwnerId())).first().now();
-
-        NotificationHelper.sendVoteUpNotification(record.getRegId(),
-                postKey.toWebSafeString(), userKey.toWebSafeString(), account.getUsername());*/
     }
 
     private void defaultVote(final Key<Account> userKey, final Key<ForumPost> postKey) {
@@ -93,8 +75,8 @@ public class VoteController {
             @Override
             public void vrun() {
                 Vote vote = getVote(userKey, postKey);
-
                 vote.setStatus(status);
+
                 ofy().save().entity(vote);
             }
         });

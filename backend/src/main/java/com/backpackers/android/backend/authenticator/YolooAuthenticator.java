@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 public class YolooAuthenticator implements Authenticator {
 
     @Override
-    public User authenticate(HttpServletRequest request) {
+    public User authenticate(final HttpServletRequest request) {
         final String authzHeader = request.getHeader(OAuth.HeaderType.AUTHORIZATION);
 
         if (Strings.isNullOrEmpty(authzHeader) ||
@@ -23,8 +23,8 @@ public class YolooAuthenticator implements Authenticator {
 
         final String accessToken = authzHeader.substring(6).trim();
 
-        Token token = TokenController.getTokenByAccessToken(accessToken);
-        if (token == null || token.isTokenExpired()) {
+        final Token token = TokenController.getTokenByAccessToken(accessToken);
+        if (token == null /*|| token.isTokenExpired()*/) {
             return null;
         }
 

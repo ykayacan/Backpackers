@@ -6,6 +6,7 @@ import com.google.appengine.api.ThreadManager;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.users.User;
+import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.tools.cloudstorage.GcsFilename;
 import com.google.common.collect.ImmutableList;
 
@@ -25,7 +26,6 @@ import com.backpackers.android.backend.model.media.Metadata;
 import com.backpackers.android.backend.model.user.Account;
 import com.backpackers.android.backend.model.user.UserCounterShard;
 import com.backpackers.android.backend.model.vote.Vote;
-import com.backpackers.android.backend.service.OfyHelper;
 import com.backpackers.android.backend.util.CommentHelper;
 import com.backpackers.android.backend.util.NotificationHelper;
 import com.backpackers.android.backend.util.StringUtil;
@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static com.backpackers.android.backend.service.OfyHelper.ofy;
 
 public class ForumController extends PostController {
 
@@ -67,7 +69,7 @@ public class ForumController extends PostController {
         final Key<ForumPost> postKey = Key.create(websafePostKey);
         final Key<Account> userKey = Key.create(user.getUserId());
 
-        final ForumPost post = OfyHelper.ofy().load().key(postKey).now();
+        final ForumPost post = ofy().load().key(postKey).now();
 
         final List<LoadResult<Key<Vote>>> votedKeys = VoteHelper.loadAsyncVoteKeys(userKey, postKey);
         final LoadResult<Key<Comment>> commentKeysMap = CommentHelper.loadAsyncComments(userKey, postKey);
@@ -92,26 +94,28 @@ public class ForumController extends PostController {
                 .filter("followeeKey =", userKey).keys().first();*/
 
         // Get related account.
-        final Account account = OfyHelper.ofy().load().key(userKey).now();
+        final Account account = ofy().load().key(userKey).now();
 
         try {
-            OfyHelper.ofy().load().type(ForumPost.class).ancestor(userKey).keys().first().safe();
+            ofy().load().type(ForumPost.class).ancestor(userKey).keys().first().safe();
         } catch (NotFoundException e) {
             final Badge badge = new EntrepreneurBadge();
             if (!account.getBadges().contains(badge)) {
                 account.addBadge(new EntrepreneurBadge());
 
-                RegistrationRecord record = OfyHelper.ofy().load().type(RegistrationRecord.class)
+                RegistrationRecord record = ofy().load().type(RegistrationRecord.class)
                         .ancestor(userKey).first().now();
 
-                NotificationHelper.sendAchievementNotification(record.getRegId(),
-                        badge.getName(), badge.getImageUrl(), badge.getContent());
+                if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
+                    NotificationHelper.sendAchievementNotification(record.getRegId(),
+                            badge.getName(), badge.getImageUrl(), badge.getContent());
+                }
             }
         }
 
         // Allocate an id with parent user key.
         final Key<ForumPost> postKey =
-                OfyHelper.ofy().factory().allocateId(userKey, ForumPost.class);
+                ofy().factory().allocateId(userKey, ForumPost.class);
 
         Map<Key<Media>, Media> mediaMap = getKeyMediaMap(mediaIds, postKey);
 
@@ -144,7 +148,7 @@ public class ForumController extends PostController {
             builder.addAll(mediaMap.values());
         }
 
-        OfyHelper.ofy().save().entities(builder.build());
+        ofy().save().entities(builder.build());
 
         //TimelineUtil.updateTimeline(userKey, followResult, post);
 
@@ -164,7 +168,7 @@ public class ForumController extends PostController {
         final Key<ForumPost> postKey = Key.create(websafePostId);
         final Key<Account> userKey = Key.create(user.getUserId());
 
-        final ForumPost post = OfyHelper.ofy().load().key(postKey).now();
+        final ForumPost post = ofy().load().key(postKey).now();
 
         ImmutableList<LoadResult<Key<Vote>>> asyncVoteResult =
                 VoteHelper.loadAsyncVoteKeys(userKey, postKey);
@@ -192,7 +196,7 @@ public class ForumController extends PostController {
             builder.addAll(hashTags);
         }
 
-        OfyHelper.ofy().save().entities(builder.build());
+        ofy().save().entities(builder.build());
 
         return post;
     }
@@ -210,21 +214,21 @@ public class ForumController extends PostController {
         final Key<Account> userKey = Key.create(user.getUserId());
 
         // Get all location keys belong to post.
-        final List<Key<Location>> locationKeys = OfyHelper.ofy().load().type(Location.class)
+        final List<Key<Location>> locationKeys = ofy().load().type(Location.class)
                 .filter("postKey =", postKey).keys().list();
 
         // Get all vote keys belong to post.
-        final List<Key<Vote>> voteKeys = OfyHelper.ofy().load().type(Vote.class)
+        final List<Key<Vote>> voteKeys = ofy().load().type(Vote.class)
                 .filter("postKey =", postKey)
                 .keys().list();
 
         // Get all medias belong to post.
-        final List<Media> medias = OfyHelper.ofy().load().type(Media.class)
+        final List<Media> medias = ofy().load().type(Media.class)
                 .filter("websafePostId =", websafePostId)
                 .list();
 
         // Get user counter shard.
-        final UserCounterShard shard = OfyHelper.ofy().load().type(UserCounterShard.class)
+        final UserCounterShard shard = ofy().load().type(UserCounterShard.class)
                 .ancestor(userKey).first().now();
 
         // Reduce count by one.
@@ -236,8 +240,8 @@ public class ForumController extends PostController {
                 .add(postKey)
                 .build();
 
-        OfyHelper.ofy().delete().entities(deleteList);
-        OfyHelper.ofy().save().entity(shard);
+        ofy().delete().entities(deleteList);
+        ofy().save().entity(shard);
 
         // Delete medias in storage.
         if (!medias.isEmpty()) {
@@ -257,7 +261,7 @@ public class ForumController extends PostController {
                 }
             }).run();
 
-            OfyHelper.ofy().delete().entities(medias);
+            ofy().delete().entities(medias);
         }
     }
 
@@ -270,7 +274,7 @@ public class ForumController extends PostController {
 
         final Key<Account> userKey = Key.create(user.getUserId());
 
-        Query<ForumPost> query = OfyHelper.ofy().load().type(ForumPost.class);
+        Query<ForumPost> query = ofy().load().type(ForumPost.class);
 
         if (targetUserId != null) {
             query = query.ancestor(Key.<Account>create(targetUserId));
@@ -319,7 +323,7 @@ public class ForumController extends PostController {
     private UserCounterShard loadAndIncreaseUserQuestionCounter(Key<Account> userKey) {
         // Find first shard and increase the question counter.
         // Users don't post a question rapidly so it is safe to use first shard.
-        UserCounterShard shard = OfyHelper.ofy().load().type(UserCounterShard.class)
+        UserCounterShard shard = ofy().load().type(UserCounterShard.class)
                 .ancestor(userKey).first().now();
 
         shard.setQuestionCount(shard.getQuestionCount() + 1);
@@ -344,7 +348,7 @@ public class ForumController extends PostController {
             for (String mediaId : mediaIdList) {
                 mediaKeys.add(Key.<Media>create(mediaId));
             }
-            mediaMap = OfyHelper.ofy().load().keys(mediaKeys);
+            mediaMap = ofy().load().keys(mediaKeys);
 
             final String websafePostKey = postKey.toWebSafeString();
             for (Media media : mediaMap.values()) {
